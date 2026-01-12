@@ -1,0 +1,88 @@
+<section class="detail">
+  @if (game()?.background_image) {
+    <div
+      class="detail-bg"
+      [style.background-image]="'url(' + game()!.background_image + ')'"
+      aria-hidden="true"
+    ></div>
+  }
+  @if (isLoading()) {
+    <app-loading message="Caricamento dettaglio..."></app-loading>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (game()) {
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-top">
+          <div class="hero-title">
+            <h1>{{ game()!.name }}</h1>
+            <div class="meta">Uscita: {{ formatDate(game()!.released) }}</div>
+            @if (game()!.genres.length) {
+              <div class="genres">
+                @for (genre of game()!.genres.slice(0, 2); track genre.id) {
+                  <span class="pill">{{ genre.name }}</span>
+                }
+              </div>
+            }
+          </div>
+          @if (platformIcons(game()!).length) {
+            <div class="platforms" aria-label="Piattaforme disponibili">
+              @for (icon of platformIcons(game()!); track icon.key) {
+                <span class="platform" role="img" [attr.aria-label]="icon.label" [attr.title]="icon.label">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path [attr.d]="icon.path"></path>
+                  </svg>
+                </span>
+              }
+            </div>
+          }
+        </div>
+        <div class="cta-row">
+          <button type="button" class="cta primary">➕ Aggiungi al backlog</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="ai">
+      <div class="ai-header">AI Insight</div>
+      <p>
+        Un open world narrativo lento e immersivo, perfetto se cerchi una storia forte e non hai fretta.
+        Ideale per sessioni lunghe e per chi ama esplorare.
+      </p>
+    </section>
+
+    <section class="pills">
+      <div class="pill-card">🕒 Durata stimata: <strong>{{ game()!.playtime ? game()!.playtime + 'h' : 'N/D' }}</strong></div>
+      <div class="pill-card">🎮 Modalità: <strong>{{ gameModes(game()!) }}</strong></div>
+      <div class="pill-card">🧠 Difficoltà stimata: <strong>Media</strong></div>
+      <div class="pill-card">📦 Serie / franchise: <strong>—</strong></div>
+      <div class="pill-card">🏷️ Tag principali: <strong>{{ genreNames(game()!) }}</strong></div>
+    </section>
+
+    @if (game()!.description_raw) {
+      <section class="description">
+        <div class="description-header">
+          <span>Descrizione</span>
+          <button type="button" class="toggle" (click)="toggleDescription()">
+            {{ isDescriptionExpanded() ? 'Mostra meno' : 'Mostra di più' }}
+          </button>
+        </div>
+        <div class="description-body" [class.clamped]="!isDescriptionExpanded()">
+          {{ game()!.description_raw }}
+        </div>
+      </section>
+    }
+
+    @if (game()!.short_screenshots?.length) {
+      <section class="screens">
+        @for (shot of game()!.short_screenshots.slice(0, 3); track shot.id) {
+          <img [src]="shot.image" [alt]="game()!.name + ' screenshot'" loading="lazy" />
+        }
+      </section>
+    }
+  }
+</section>

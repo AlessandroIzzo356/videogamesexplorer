@@ -1,0 +1,68 @@
+<article class="card">
+  <div class="media">
+    @if (game.background_image) {
+      <img [src]="game.background_image" [alt]="game.name" loading="lazy" />
+    } @else {
+      <div class="media-fallback">
+        <span class="fallback-subtitle">Nessuna immagine</span>
+      </div>
+    }
+
+    @if (game.genres.length) {
+      <span class="badge">{{ game.genres[0].name }}</span>
+    }
+    @if (platformIcons().length) {
+      <div class="platforms" aria-label="Piattaforme disponibili">
+        @for (icon of platformIcons(); track icon.key) {
+          <span class="platform" role="img" [attr.aria-label]="icon.label" [attr.title]="icon.label">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path [attr.d]="icon.path"></path>
+            </svg>
+          </span>
+        }
+      </div>
+    }
+
+    <div class="footer">
+      <div class="title">{{ game.name }}</div>
+      <div class="info">
+        <div class="stars" [attr.aria-label]="'Rating ' + game.rating">
+          @for (filled of stars(game.rating); track $index) {
+            <svg
+              class="star"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              [class.filled]="filled"
+            >
+              <path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1-4.5-4.4 6.2-.9L12 3z"></path>
+            </svg>
+          }
+        </div>
+        @if (game.released) {
+          <div class="meta">Uscita: {{ formatDate(game.released) }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="overlay">
+      <div class="actions" role="group" aria-label="Azioni gioco">
+        <button type="button" class="action" aria-label="Aggiungi al backlog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+        </button>
+        <a class="action" [routerLink]="['/game', game.id]" aria-label="Vai al dettaglio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</article>

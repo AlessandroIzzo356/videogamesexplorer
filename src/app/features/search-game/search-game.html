@@ -1,0 +1,75 @@
+<section class="search-page">
+  <div class="search-hero">
+    <h1>Cerca giochi</h1>
+    <p>Scopri titoli, generi e nuove uscite con una ricerca veloce e pulita.</p>
+  </div>
+
+  <form class="search-bar" role="search" aria-label="Cerca giochi" (submit)="onSearch($event)">
+    <span class="search-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M20 20l-3.2-3.2"></path>
+      </svg>
+    </span>
+    <input
+      type="search"
+      placeholder="Es. Hades, Zelda, roguelike..."
+      [value]="query()"
+      (input)="onQueryChange($any($event.target).value)"
+    />
+    <button type="submit">Cerca</button>
+    <span class="glow" aria-hidden="true"></span>
+  </form>
+
+  @if (isSuggesting()) {
+    <div class="suggestions" role="listbox" aria-label="Suggerimenti giochi">
+      @for (_ of [].constructor(5); track $index) {
+        <div class="suggestion skeleton">
+          <span class="skeleton-thumb"></span>
+          <span class="skeleton-title"></span>
+          <span class="skeleton-meta"></span>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isSuggesting() && suggestions().length) {
+    <div class="suggestions" role="listbox" aria-label="Suggerimenti giochi">
+      @for (game of suggestions(); track game.id ?? game.name) {
+        <button type="button" class="suggestion" role="option" (click)="applySuggestion(game)">
+          @if (game.background_image) {
+            <img [src]="game.background_image" [alt]="game.name" loading="lazy" />
+          } @else {
+            <span class="suggestion-fallback" aria-hidden="true">{{ game.name.charAt(0) }}</span>
+          }
+          <span class="suggestion-title">{{ game.name }}</span>
+          @if (game.released) {
+            <span class="suggestion-meta">{{ formatDate(game.released) }}</span>
+          }
+        </button>
+      }
+    </div>
+  }
+
+  <div class="hint-row">
+    <span class="hint">Prova: coop locale</span>
+    <span class="hint">RPG open world</span>
+    <span class="hint">Indie 2024</span>
+  </div>
+
+  @if (isLoading()) {
+    <app-loading message="Caricamento giochi..." variant="cards" [count]="8"></app-loading>
+  }
+
+  @if (error()) {
+    <div class="status-row error">{{ error() }}</div>
+  }
+
+  @if (results().length) {
+    <div class="results">
+      @for (game of results(); track game.id ?? game.name) {
+        <app-game-card [game]="game"></app-game-card>
+      }
+    </div>
+  }
+</section>

@@ -1,1 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  color-scheme: light;
+  --page-bg: radial-gradient(1200px 600px at 10% 0%, rgba(59, 130, 246, 0.15), transparent 60%),
+    radial-gradient(800px 500px at 90% 10%, rgba(236, 72, 153, 0.12), transparent 55%),
+    linear-gradient(180deg, #0b1220 0%, #0c1222 40%, #0a101d 100%);
+  --page-foreground: #e5e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--page-foreground);
+  font-family: "Sora", system-ui, sans-serif;
+}
