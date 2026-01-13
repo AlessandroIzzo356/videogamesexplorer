@@ -16,40 +16,19 @@
       placeholder="Es. Hades, Zelda, roguelike..."
       [value]="query()"
       (input)="onQueryChange($any($event.target).value)"
+      (keydown.enter)="onSearch($event)"
     />
     <button type="submit">Cerca</button>
     <span class="glow" aria-hidden="true"></span>
   </form>
 
-  @if (isSuggesting()) {
-    <div class="suggestions" role="listbox" aria-label="Suggerimenti giochi">
-      @for (_ of [].constructor(5); track $index) {
-        <div class="suggestion skeleton">
-          <span class="skeleton-thumb"></span>
-          <span class="skeleton-title"></span>
-          <span class="skeleton-meta"></span>
-        </div>
-      }
-    </div>
-  }
-
-  @if (!isSuggesting() && suggestions().length) {
-    <div class="suggestions" role="listbox" aria-label="Suggerimenti giochi">
-      @for (game of suggestions(); track game.id ?? game.name) {
-        <button type="button" class="suggestion" role="option" (click)="applySuggestion(game)">
-          @if (game.background_image) {
-            <img [src]="game.background_image" [alt]="game.name" loading="lazy" />
-          } @else {
-            <span class="suggestion-fallback" aria-hidden="true">{{ game.name.charAt(0) }}</span>
-          }
-          <span class="suggestion-title">{{ game.name }}</span>
-          @if (game.released) {
-            <span class="suggestion-meta">{{ formatDate(game.released) }}</span>
-          }
-        </button>
-      }
-    </div>
-  }
+  <app-game-suggestions
+    [isLoading]="isSuggesting()"
+    [suggestions]="suggestions()"
+    [addedIds]="addedIds()"
+    (select)="applySuggestion($event)"
+    (add)="addToBacklog($event)"
+  ></app-game-suggestions>
 
   <div class="hint-row">
     <span class="hint">Prova: coop locale</span>
@@ -68,7 +47,11 @@
   @if (results().length) {
     <div class="results">
       @for (game of results(); track game.id ?? game.name) {
-        <app-game-card [game]="game"></app-game-card>
+        <app-game-card
+          [game]="game"
+          [isAdded]="addedIds().has(game.id)"
+          (addToBacklog)="addToBacklog($event)"
+        ></app-game-card>
       }
     </div>
   }

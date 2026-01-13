@@ -1,22 +1,28 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, Subject, debounceTime, distinctUntilChanged, filter, map, of, switchMap, catchError, tap } from 'rxjs';
 import { RawgService } from '../../services/rawg.service';
+import { BacklogService } from '../../services/backlog.service';
 import { GameCard } from '../../shared/game-card/game-card';
 import { Loading } from '../../shared/loading/loading';
+import { GameSuggestions } from '../../shared/game-suggestions/game-suggestions';
 import { RawgGame, RawgGamesResponse } from '../../models/rawg';
 
 @Component({
   selector: 'app-search-game',
   standalone: true,
-  imports: [GameCard, Loading],
+  imports: [GameCard, Loading, GameSuggestions],
   templateUrl: './search-game.html',
   styleUrl: './search-game.css'
 })
 export class SearchGame {
   private rawg = inject(RawgService);
+  private backlogService = inject(BacklogService);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
   private suggestionQuery$ = new Subject<string>();
+  private addAudio = new Audio('/audio/add-game.mp3');
 
   query = signal('');
   results = signal<RawgGame[]>([]);
@@ -24,8 +30,10 @@ export class SearchGame {
   isLoading = signal(false);
   isSuggesting = signal(false);
   error = signal<string | null>(null);
+  addedIds = signal(new Set<number>());
 
   constructor() {
+    this.addAudio.volume = 1;
     this.suggestionQuery$
       .pipe(
         debounceTime(300),
@@ -67,10 +75,13 @@ export class SearchGame {
     if (!value) {
       this.results.set([]);
       this.suggestions.set([]);
+      this.isSuggesting.set(false);
       return;
     }
 
     this.suggestions.set([]);
+    this.isSuggesting.set(false);
+    this.suggestionQuery$.next('');
     this.isLoading.set(true);
     this.error.set(null);
 
@@ -90,21 +101,26 @@ export class SearchGame {
   }
 
   applySuggestion(game: RawgGame) {
-    this.query.set(game.name);
     this.suggestions.set([]);
-    this.onSearch();
+    this.router.navigate(['/game', game.id]);
   }
 
-  formatDate(value: string) {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return value;
+  async addToBacklog(game: RawgGame) {
+    if (this.addedIds().has(game.id)) {
+      return;
     }
-    return new Intl.DateTimeFormat('it-IT', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    }).format(date);
+    try {
+      await this.backlogService.addToBacklog(game);
+      this.addedIds.update(current => {
+        const next = new Set(current);
+        next.add(game.id);
+        return next;
+      });
+      this.addAudio.currentTime = 0;
+      void this.addAudio.play().catch(() => undefined);
+    } catch {
+      this.error.set('Non sei autenticato. Effettua il login.');
+    }
   }
 
 }

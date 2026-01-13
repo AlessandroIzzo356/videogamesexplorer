@@ -1,0 +1,78 @@
+@if (isLoading) {
+  <div class="suggestions-panel" role="listbox" aria-label="Suggerimenti giochi">
+    @for (_ of [].constructor(5); track $index) {
+      <div class="suggestion-row skeleton">
+        <span class="skeleton-thumb"></span>
+        <div class="skeleton-body">
+          <span class="skeleton-line"></span>
+          <span class="skeleton-line wide"></span>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (!isLoading && suggestions.length) {
+  <div class="suggestions-panel" role="listbox" aria-label="Suggerimenti giochi">
+    @for (game of suggestions; track game.id ?? game.name) {
+      <button type="button" class="suggestion-row" role="option" (click)="select.emit(game)">
+        @if (game.background_image) {
+          <img [src]="game.background_image" [alt]="game.name" loading="lazy" />
+        } @else {
+          <span class="thumb-fallback" aria-hidden="true">{{ game.name.charAt(0) }}</span>
+        }
+        <div class="suggestion-body">
+          <div class="title-row">
+            <span class="title">{{ game.name }}</span>
+            <button
+              type="button"
+              class="add action-style"
+              [class.success]="isAdded(game.id)"
+              [attr.aria-label]="isAdded(game.id) ? 'Già nel backlog' : 'Aggiungi al backlog'"
+              [disabled]="isAdded(game.id)"
+              (click)="$event.stopPropagation(); add.emit(game)"
+            >
+              @if (isAdded(game.id)) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12l4 4 10-10"></path>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 5v14"></path>
+                  <path d="M5 12h14"></path>
+                </svg>
+              }
+            </button>
+          </div>
+          <div class="meta-row">
+            <div class="rating">
+              <span class="rating-value">{{ game.rating.toFixed(1) }}</span>
+              <div class="stars" aria-hidden="true">
+                @for (filled of stars(game.rating); track $index) {
+                  <svg class="star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" [class.filled]="filled">
+                    <path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1-4.5-4.4 6.2-.9L12 3z"></path>
+                  </svg>
+                }
+              </div>
+            </div>
+            @if (platformIcons(game).length) {
+              <div class="platforms" aria-label="Piattaforme disponibili">
+                @for (icon of platformIcons(game); track icon.key) {
+                  @if (icon.key === 'nintendo') {
+                    <span class="platform nintendo" title="Nintendo" aria-label="Nintendo">N</span>
+                  } @else {
+                    <span class="platform" role="img" [attr.aria-label]="icon.label" [attr.title]="icon.label">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path [attr.d]="icon.path"></path>
+                      </svg>
+                    </span>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </button>
+    }
+  </div>
+}

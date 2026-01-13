@@ -11,14 +11,18 @@
     @if (game.genres.length) {
       <span class="badge">{{ game.genres[0].name }}</span>
     }
-    @if (platformIcons().length) {
+    @if (platformIcons(game).length) {
       <div class="platforms" aria-label="Piattaforme disponibili">
-        @for (icon of platformIcons(); track icon.key) {
-          <span class="platform" role="img" [attr.aria-label]="icon.label" [attr.title]="icon.label">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path [attr.d]="icon.path"></path>
-            </svg>
-          </span>
+        @for (icon of platformIcons(game); track icon.key) {
+          @if (icon.key === 'nintendo') {
+            <span class="platform nintendo" role="img" aria-label="Nintendo" title="Nintendo">N</span>
+          } @else {
+            <span class="platform" role="img" [attr.aria-label]="icon.label" [attr.title]="icon.label">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path [attr.d]="icon.path"></path>
+              </svg>
+            </span>
+          }
         }
       </div>
     }
@@ -50,12 +54,40 @@
 
     <div class="overlay">
       <div class="actions" role="group" aria-label="Azioni gioco">
-        <button type="button" class="action" aria-label="Aggiungi al backlog">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 5v14"></path>
-            <path d="M5 12h14"></path>
-          </svg>
-        </button>
+        @if (showAdd) {
+          <button
+            type="button"
+            class="action"
+            [class.success]="isAdded"
+            [attr.aria-label]="isAdded ? 'Già nel backlog' : 'Aggiungi al backlog'"
+            [disabled]="isAdded"
+            (click)="addToBacklog.emit(game)"
+          >
+            @if (isAdded) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12l4 4 10-10"></path>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14"></path>
+                <path d="M5 12h14"></path>
+              </svg>
+            }
+          </button>
+        }
+        @if (showRemove) {
+          <button
+            type="button"
+            class="action danger"
+            aria-label="Rimuovi dal backlog"
+            (click)="removeFromBacklog.emit(game)"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 6l12 12"></path>
+              <path d="M18 6l-12 12"></path>
+            </svg>
+          </button>
+        }
         <a class="action" [routerLink]="['/game', game.id]" aria-label="Vai al dettaglio">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path>

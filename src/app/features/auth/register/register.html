@@ -1,0 +1,68 @@
+<section class="register-page">
+  <div class="register-shell">
+    <div class="register-card">
+      <div class="register-header">
+        <span class="register-pill">Registrazione</span>
+        <h1>Crea un profilo</h1>
+        <p>Imposta il tuo nickname e accedi ai salvataggi personali.</p>
+      </div>
+
+      <form class="register-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <label class="field">
+          <span>Nickname</span>
+          <input
+            type="text"
+            formControlName="nickname"
+            placeholder="Es. PlayerOne"
+            autocomplete="nickname"
+          />
+        </label>
+        @if (form.controls.nickname.touched && form.controls.nickname.invalid) {
+          <span class="field-error">Il nickname deve avere almeno 3 caratteri.</span>
+        }
+
+        <label class="field">
+          <span>Email</span>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="nome@email.com"
+            autocomplete="email"
+          />
+        </label>
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error">Inserisci un'email valida.</span>
+        }
+
+        <label class="field">
+          <span>Password</span>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Minimo 6 caratteri"
+            autocomplete="new-password"
+          />
+        </label>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="field-error">La password deve avere almeno 6 caratteri.</span>
+        }
+
+        @if (error()) {
+          <div class="form-error" role="alert">{{ error() }}</div>
+        }
+
+        <button type="submit" [disabled]="form.invalid || isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="spinner" aria-hidden="true"></span>
+          }
+          Registrati
+        </button>
+      </form>
+
+      <div class="register-footer">
+        <span>Hai gia un account?</span>
+        <a class="text-link" routerLink="/login">Accedi</a>
+      </div>
+    </div>
+  </div>
+</section>

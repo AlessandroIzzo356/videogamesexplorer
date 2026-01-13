@@ -1,0 +1,31 @@
+<section class="backlog-page">
+  <div class="backlog-hero">
+    <h1>Il tuo backlog</h1>
+    <p>I giochi salvati per le prossime sessioni.</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="backlog-grid">
+      @for (_ of [].constructor(6); track $index) {
+        <div class="backlog-skeleton"></div>
+      }
+    </div>
+  }
+
+  @if (!isLoading() && !games().length) {
+    <div class="empty-state">Nessun gioco salvato. Aggiungine uno dalla ricerca.</div>
+  }
+
+  @if (!isLoading() && games().length) {
+    <div class="backlog-grid">
+      @for (game of games(); track game.id ?? game.name) {
+        <app-game-card
+          [game]="game"
+          [showAdd]="false"
+          [showRemove]="true"
+          (removeFromBacklog)="removeFromBacklog($event.id)"
+        ></app-game-card>
+      }
+    </div>
+  }
+</section>

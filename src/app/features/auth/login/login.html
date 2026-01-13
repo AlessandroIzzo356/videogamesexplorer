@@ -1,0 +1,56 @@
+<section class="login-page">
+  <div class="login-shell">
+    <div class="login-card">
+      <div class="login-header">
+        <span class="login-pill">Accesso</span>
+        <h1>Bentornato</h1>
+        <p>Accedi per salvare il backlog, le ricerche e i titoli preferiti.</p>
+      </div>
+
+      <form class="login-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <label class="field">
+          <span>Email</span>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="nome@email.com"
+            autocomplete="email"
+          />
+        </label>
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error">Inserisci un'email valida.</span>
+        }
+
+        <label class="field">
+          <span>Password</span>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Minimo 6 caratteri"
+            autocomplete="current-password"
+          />
+        </label>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="field-error">La password deve avere almeno 6 caratteri.</span>
+        }
+
+        @if (error()) {
+          <div class="form-error" role="alert">{{ error() }}</div>
+        }
+
+        <button type="submit" [disabled]="form.invalid || isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="spinner" aria-hidden="true"></span>
+          }
+          Accedi
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <span>Non hai un account?</span>
+        <a class="text-link" routerLink="/register">Crea un profilo</a>
+      </div>
+    </div>
+
+  </div>
+</section>

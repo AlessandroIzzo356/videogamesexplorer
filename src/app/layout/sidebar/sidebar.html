@@ -1,7 +1,26 @@
-<aside class="sidebar" aria-label="Navigazione">
+<aside class="sidebar" aria-label="Navigazione" [class.collapsed]="isCollapsed()">
   <div class="brand">
-    <span class="logo">Backlog</span><span class="badge">AI</span>
+    <div class="brand-title">
+      <span class="logo">Backlog</span><span class="badge">AI</span>
+    </div>
+    <button type="button" class="collapse-toggle" (click)="toggleSidebar()" [attr.aria-label]="isCollapsed() ? 'Espandi sidebar' : 'Riduci sidebar'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 6l-6 6 6 6"></path>
+      </svg>
+    </button>
   </div>
+
+  @if (user()) {
+    <div class="user-chip">
+      <span class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21a8 8 0 0 0-16 0"></path>
+          <circle cx="12" cy="8" r="4"></circle>
+        </svg>
+      </span>
+      <span class="user-name">{{ user()?.displayName ?? user()?.email }}</span>
+    </div>
+  }
 
   <nav class="nav">
     <a
@@ -18,7 +37,7 @@
           <circle cx="4" cy="18" r="1.5"></circle>
         </svg>
       </span>
-      Backlog
+      <span class="label">Backlog</span>
     </a>
     <a class="nav-item" routerLink="/search-game" routerLinkActive="active">
       <span class="icon" aria-hidden="true">
@@ -27,7 +46,7 @@
           <path d="M20 20l-3.2-3.2"></path>
         </svg>
       </span>
-      Cerca giochi
+      <span class="label">Cerca giochi</span>
     </a>
     <a class="nav-item" routerLink="/tonight" routerLinkActive="active">
       <span class="icon" aria-hidden="true">
@@ -49,7 +68,16 @@
           <path d="M19.4 15a1.8 1.8 0 0 0 .36 2l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.07a1.8 1.8 0 0 0-1-1.6 1.8 1.8 0 0 0-2 .36l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.8 1.8 0 0 0 .36-2 1.8 1.8 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.07a1.8 1.8 0 0 0 1.6-1 1.8 1.8 0 0 0-.36-2l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.8 1.8 0 0 0 2 .36 1.8 1.8 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.07a1.8 1.8 0 0 0 1 1.6 1.8 1.8 0 0 0 2-.36l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.8 1.8 0 0 0-.36 2 1.8 1.8 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.07a1.8 1.8 0 0 0-1.6 1z"></path>
         </svg>
       </span>
-      Impostazioni
+      <span class="label">Impostazioni</span>
     </a>
+    <button type="button" class="nav-item muted button" (click)="logout()">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 7l-1.5 1.5L11 11H3v2h8l-2.5 2.5L10 17l5-5-5-5z"></path>
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+        </svg>
+      </span>
+      <span class="label">Logout</span>
+    </button>
   </div>
 </aside>

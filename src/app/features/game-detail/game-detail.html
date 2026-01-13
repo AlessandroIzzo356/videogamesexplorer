@@ -7,7 +7,63 @@
     ></div>
   }
   @if (isLoading()) {
-    <app-loading message="Caricamento dettaglio..."></app-loading>
+    <div class="detail-skeleton">
+      <div class="hero skeleton-card">
+        <div class="hero-content">
+          <div class="hero-top">
+            <div class="hero-title">
+              <div class="skeleton-line skeleton-title"></div>
+              <div class="skeleton-line skeleton-meta"></div>
+              <div class="skeleton-row">
+                <span class="skeleton-pill"></span>
+                <span class="skeleton-pill"></span>
+              </div>
+            </div>
+            <div class="platforms">
+              <span class="skeleton-icon"></span>
+              <span class="skeleton-icon"></span>
+              <span class="skeleton-icon"></span>
+            </div>
+          </div>
+          <div class="cta-row">
+            <div class="skeleton-button"></div>
+          </div>
+        </div>
+      </div>
+
+      <section class="ai skeleton-card">
+        <div class="skeleton-line skeleton-small"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-wide"></div>
+      </section>
+
+      <section class="pills skeleton-pills">
+        <div class="pill-card skeleton-card">
+          <div class="skeleton-line skeleton-small"></div>
+        </div>
+        <div class="pill-card skeleton-card">
+          <div class="skeleton-line skeleton-small"></div>
+        </div>
+        <div class="pill-card skeleton-card">
+          <div class="skeleton-line skeleton-small"></div>
+        </div>
+        <div class="pill-card skeleton-card">
+          <div class="skeleton-line skeleton-small"></div>
+        </div>
+      </section>
+
+      <section class="description skeleton-card">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-wide"></div>
+        <div class="skeleton-line"></div>
+      </section>
+
+      <section class="screens skeleton-screens">
+        <div class="skeleton-thumb"></div>
+        <div class="skeleton-thumb"></div>
+        <div class="skeleton-thumb"></div>
+      </section>
+    </div>
   }
 
   @if (error()) {
