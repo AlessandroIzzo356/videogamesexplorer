@@ -6,7 +6,7 @@
       aria-hidden="true"
     ></div>
   }
-  @if (isLoading()) {
+  @if (isLoading() || aiLoading() || seriesLoading()) {
     <div class="detail-skeleton">
       <div class="hero skeleton-card">
         <div class="hero-content">
@@ -70,7 +70,7 @@
     <div class="error">{{ error() }}</div>
   }
 
-  @if (game()) {
+  @if (game() && !isLoading() && !aiLoading() && !seriesLoading()) {
     <div class="hero">
       <div class="hero-content">
         <div class="hero-top">
@@ -88,47 +88,105 @@
           @if (platformIcons(game()!).length) {
             <div class="platforms" aria-label="Piattaforme disponibili">
               @for (icon of platformIcons(game()!); track icon.key) {
-                <span class="platform" role="img" [attr.aria-label]="icon.label" [attr.title]="icon.label">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path [attr.d]="icon.path"></path>
-                  </svg>
-                </span>
+                @if (icon.key === 'nintendo') {
+                  <span class="platform nintendo" role="img" aria-label="Nintendo" title="Nintendo">N</span>
+                } @else {
+                  <span class="platform" role="img" [attr.aria-label]="icon.label" [attr.title]="icon.label">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path [attr.d]="icon.path"></path>
+                    </svg>
+                  </span>
+                }
               }
             </div>
           }
         </div>
         <div class="cta-row">
-          <button type="button" class="cta primary">➕ Aggiungi al backlog</button>
+          @if (isInBacklog()) {
+            <button
+              type="button"
+              class="cta primary added removable"
+              aria-label="Rimuovi dal backlog"
+              (click)="removeFromBacklog()"
+            >
+              <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12l4 4 10-10"></path>
+              </svg>
+              <span class="label-check">Nel backlog</span>
+              <svg class="icon-remove" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 6l12 12"></path>
+                <path d="M18 6l-12 12"></path>
+              </svg>
+              <span class="label-remove">Rimuovi dal backlog</span>
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="cta primary"
+              (click)="addToBacklog()"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14"></path>
+                <path d="M5 12h14"></path>
+              </svg>
+              <span>Aggiungi al backlog</span>
+            </button>
+          }
         </div>
       </div>
     </div>
 
     <section class="ai">
-      <div class="ai-header">AI Insight</div>
-      <p>
-        Un open world narrativo lento e immersivo, perfetto se cerchi una storia forte e non hai fretta.
-        Ideale per sessioni lunghe e per chi ama esplorare.
-      </p>
+      <div class="ai-header">🧠 Consiglio</div>
+      @if (aiLoading()) {
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-wide"></div>
+      } @else if (aiError()) {
+        <p>{{ aiError() }}</p>
+      } @else if (aiInsight()) {
+        <p>{{ aiInsight()!.consiglio }}</p>
+        @if (aiInsight()!.vibe) {
+          <div class="ai-vibe">
+            <span class="ai-vibe-icon" aria-hidden="true">✦</span>
+            <span class="ai-vibe-text">{{ aiInsight()!.vibe }}</span>
+          </div>
+        }
+        @if (aiInsight()!.cosa_aspettarti) {
+          <div class="ai-subtitle">Cosa aspettarti</div>
+          <p class="ai-extra">{{ aiInsight()!.cosa_aspettarti }}</p>
+        }
+      } @else {
+        <p>Insight non disponibile.</p>
+      }
     </section>
 
     <section class="pills">
-      <div class="pill-card">🕒 Durata stimata: <strong>{{ game()!.playtime ? game()!.playtime + 'h' : 'N/D' }}</strong></div>
+      <div class="pill-card">⏱ Durata stimata: <strong>{{ aiInsight()?.durata_stimata ?? (game()!.playtime ? game()!.playtime + 'h' : 'N/D') }}</strong></div>
       <div class="pill-card">🎮 Modalità: <strong>{{ gameModes(game()!) }}</strong></div>
-      <div class="pill-card">🧠 Difficoltà stimata: <strong>Media</strong></div>
-      <div class="pill-card">📦 Serie / franchise: <strong>—</strong></div>
+      <div class="pill-card">
+        🎯 Difficoltà stimata: <strong>{{ difficultyLabel(aiInsight()?.difficolta) }}</strong>
+        @if (aiInsight()?.perche_difficile) {
+          <div class="pill-note">{{ formatReason(aiInsight()!.perche_difficile) }}</div>
+        }
+      </div>
+      @if (franchise()) {
+        <div class="pill-card">📦 Serie / franchise: <strong>{{ franchise() }}</strong></div>
+      }
       <div class="pill-card">🏷️ Tag principali: <strong>{{ genreNames(game()!) }}</strong></div>
     </section>
 
-    @if (game()!.description_raw) {
+    @if (aiInsight()?.sinossi ?? game()!.description_raw; as synopsis) {
       <section class="description">
         <div class="description-header">
-          <span>Descrizione</span>
-          <button type="button" class="toggle" (click)="toggleDescription()">
-            {{ isDescriptionExpanded() ? 'Mostra meno' : 'Mostra di più' }}
-          </button>
+          <span>Sinossi</span>
+          @if (shouldClamp(synopsis)) {
+            <button type="button" class="toggle" (click)="toggleDescription()">
+              {{ isDescriptionExpanded() ? 'Mostra meno' : 'Mostra di più' }}
+            </button>
+          }
         </div>
-        <div class="description-body" [class.clamped]="!isDescriptionExpanded()">
-          {{ game()!.description_raw }}
+        <div class="description-body" [class.clamped]="shouldClamp(synopsis) && !isDescriptionExpanded()">
+          {{ synopsis }}
         </div>
       </section>
     }

@@ -26,8 +26,9 @@
     [isLoading]="isSuggesting()"
     [suggestions]="suggestions()"
     [addedIds]="addedIds()"
+    [useBacklogActions]="true"
     (select)="applySuggestion($event)"
-    (add)="addToBacklog($event)"
+    (actionError)="onBacklogActionError($event)"
   ></app-game-suggestions>
 
   <div class="hint-row">
@@ -50,7 +51,8 @@
         <app-game-card
           [game]="game"
           [isAdded]="addedIds().has(game.id)"
-          (addToBacklog)="addToBacklog($event)"
+          [useBacklogActions]="true"
+          (actionError)="onBacklogActionError($event)"
         ></app-game-card>
       }
     </div>

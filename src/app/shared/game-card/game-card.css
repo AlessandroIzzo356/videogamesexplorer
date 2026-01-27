@@ -204,6 +204,14 @@
   opacity: 0.9;
 }
 
+.action.is-disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
 .action svg {
   width: 20px;
   height: 20px;

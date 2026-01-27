@@ -24,25 +24,34 @@
         <div class="suggestion-body">
           <div class="title-row">
             <span class="title">{{ game.name }}</span>
-            <button
-              type="button"
-              class="add action-style"
-              [class.success]="isAdded(game.id)"
-              [attr.aria-label]="isAdded(game.id) ? 'Già nel backlog' : 'Aggiungi al backlog'"
-              [disabled]="isAdded(game.id)"
-              (click)="$event.stopPropagation(); add.emit(game)"
-            >
-              @if (isAdded(game.id)) {
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            @if (isAdded(game.id)) {
+              <button
+                type="button"
+                class="add success removable"
+                aria-label="Rimuovi dal backlog"
+                (click)="$event.stopPropagation(); handleRemove(game)"
+              >
+                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 12l4 4 10-10"></path>
                 </svg>
-              } @else {
+                <svg class="icon-remove" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 6l12 12"></path>
+                  <path d="M18 6l-12 12"></path>
+                </svg>
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="add action-style"
+                aria-label="Aggiungi al backlog"
+                (click)="$event.stopPropagation(); handleAdd(game)"
+              >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M12 5v14"></path>
                   <path d="M5 12h14"></path>
                 </svg>
-              }
-            </button>
+              </button>
+            }
           </div>
           <div class="meta-row">
             <div class="rating">

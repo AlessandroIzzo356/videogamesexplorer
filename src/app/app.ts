@@ -18,14 +18,14 @@ export class App {
   protected readonly showSidebar = signal(true);
 
   constructor() {
-    this.showSidebar.set(!this.router.url.startsWith('/login') && !this.router.url.startsWith('/register'));
+    this.showSidebar.set(!this.router.url.startsWith('/login') && !this.router.url.startsWith('/register') && !this.router.url.startsWith('/forgot-password'));
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
-        this.showSidebar.set(!this.router.url.startsWith('/login') && !this.router.url.startsWith('/register'));
+        this.showSidebar.set(!this.router.url.startsWith('/login') && !this.router.url.startsWith('/register') && !this.router.url.startsWith('/forgot-password'));
       });
   }
 }

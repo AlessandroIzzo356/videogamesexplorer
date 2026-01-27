@@ -103,6 +103,28 @@
   height: 16px;
 }
 
+.add.removable {
+  cursor: pointer;
+}
+
+.add.removable .icon-remove {
+  display: none;
+}
+
+.add.removable:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.7);
+  color: #fecaca;
+}
+
+.add.removable:hover .icon-check {
+  display: none;
+}
+
+.add.removable:hover .icon-remove {
+  display: block;
+}
+
 .meta-row {
   display: flex;
   align-items: center;

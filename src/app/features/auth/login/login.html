@@ -34,6 +34,10 @@
           <span class="field-error">La password deve avere almeno 6 caratteri.</span>
         }
 
+        <div class="login-help">
+          <a class="text-link" routerLink="/forgot-password">Hai dimenticato la password?</a>
+        </div>
+
         @if (error()) {
           <div class="form-error" role="alert">{{ error() }}</div>
         }

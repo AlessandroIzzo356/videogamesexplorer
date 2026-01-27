@@ -1,7 +1,18 @@
 <section class="backlog-page">
   <div class="backlog-hero">
-    <h1>Il tuo backlog</h1>
-    <p>I giochi salvati per le prossime sessioni.</p>
+    <div class="backlog-hero-row">
+      <div>
+        <h1>Il tuo backlog</h1>
+        <p>I giochi salvati per le prossime sessioni.</p>
+      </div>
+      @if (games().length) {
+        <label class="reorder-toggle" aria-label="Riordina backlog">
+          <span class="toggle-label">Ordina manualmente</span>
+          <input type="checkbox" [checked]="reorderEnabled()" (change)="toggleReorder()" />
+          <span class="toggle-track" aria-hidden="true"></span>
+        </label>
+      }
+    </div>
   </div>
 
   @if (isLoading()) {
@@ -17,14 +28,50 @@
   }
 
   @if (!isLoading() && games().length) {
+    @if (reorderEnabled()) {
+      <div class="reorder-hint">Usa Su / Giù per cambiare priorità</div>
+    }
     <div class="backlog-grid">
       @for (game of games(); track game.id ?? game.name) {
-        <app-game-card
-          [game]="game"
-          [showAdd]="false"
-          [showRemove]="true"
-          (removeFromBacklog)="removeFromBacklog($event.id)"
-        ></app-game-card>
+        <div class="backlog-item" [class.is-moving]="lastMovedId() === game.id">
+          <app-game-card
+            [game]="game"
+            [showAdd]="false"
+            [showRemove]="!reorderEnabled()"
+            [disableActions]="reorderEnabled()"
+            [useBacklogActions]="true"
+          ></app-game-card>
+          @if (reorderEnabled()) {
+            <div class="reorder-controls" role="group" aria-label="Riordina backlog">
+              <button
+                type="button"
+                class="reorder-btn"
+                [disabled]="$index === 0"
+                aria-label="Sposta su"
+                (click)="moveGame($index, 'up')"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 5l-6 6"></path>
+                  <path d="M12 5l6 6"></path>
+                </svg>
+                <span>Su</span>
+              </button>
+              <button
+                type="button"
+                class="reorder-btn"
+                [disabled]="$index === games().length - 1"
+                aria-label="Sposta giù"
+                (click)="moveGame($index, 'down')"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 19l-6-6"></path>
+                  <path d="M12 19l6-6"></path>
+                </svg>
+                <span>Giù</span>
+              </button>
+            </div>
+          }
+        </div>
       }
     </div>
   }

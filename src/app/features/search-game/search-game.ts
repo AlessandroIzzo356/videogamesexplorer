@@ -1,13 +1,13 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, Subject, debounceTime, distinctUntilChanged, filter, map, of, switchMap, catchError, tap } from 'rxjs';
+import { finalize, Subject, debounceTime, distinctUntilChanged, map, of, switchMap, catchError, tap } from 'rxjs';
 import { RawgService } from '../../services/rawg.service';
-import { BacklogService } from '../../services/backlog.service';
 import { GameCard } from '../../shared/game-card/game-card';
 import { Loading } from '../../shared/loading/loading';
 import { GameSuggestions } from '../../shared/game-suggestions/game-suggestions';
 import { RawgGame, RawgGamesResponse } from '../../models/rawg';
+import { BacklogService } from '../../services/backlog.service';
 
 @Component({
   selector: 'app-search-game',
@@ -17,12 +17,14 @@ import { RawgGame, RawgGamesResponse } from '../../models/rawg';
   styleUrl: './search-game.css'
 })
 export class SearchGame {
+  private static readonly SUGGESTIONS_CACHE_LIMIT = 40;
+
   private rawg = inject(RawgService);
-  private backlogService = inject(BacklogService);
   private destroyRef = inject(DestroyRef);
+  private backlogService = inject(BacklogService);
   private router = inject(Router);
   private suggestionQuery$ = new Subject<string>();
-  private addAudio = new Audio('/audio/add-game.mp3');
+  private suggestionsCache = new Map<string, RawgGame[]>();
 
   query = signal('');
   results = signal<RawgGame[]>([]);
@@ -33,30 +35,49 @@ export class SearchGame {
   addedIds = signal(new Set<number>());
 
   constructor() {
-    this.addAudio.volume = 1;
+    this.backlogService.backlog$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(games => {
+        const next = new Set(games.map(game => game.id));
+        this.addedIds.set(next);
+      });
     this.suggestionQuery$
       .pipe(
-        debounceTime(300),
+        debounceTime(400),
         map(value => value.trim()),
         distinctUntilChanged(),
-        tap(value => {
+        switchMap(value => {
           if (value.length < 3) {
-            this.suggestions.set([]);
             this.isSuggesting.set(false);
+            return of<RawgGamesResponse>({
+              count: 0,
+              next: null,
+              previous: null,
+              results: []
+            });
           }
-        }),
-        filter(value => value.length >= 3),
-        tap(() => {
-          if (!this.suggestions().length) {
-            this.isSuggesting.set(true);
+
+          const key = value.toLowerCase();
+          const cached = this.suggestionsCache.get(key);
+          if (cached) {
+            this.isSuggesting.set(false);
+            return of<RawgGamesResponse>({
+              count: cached.length,
+              next: null,
+              previous: null,
+              results: cached
+            });
           }
-        }),
-        switchMap(value =>
-          this.rawg.searchGames(value, 6).pipe(
+
+          this.isSuggesting.set(true);
+          return this.rawg.searchGames(value, 6).pipe(
+            tap(response => {
+              this.setCachedSuggestions(key, response.results ?? []);
+            }),
             catchError(() => of<RawgGamesResponse>({ count: 0, next: null, previous: null, results: [] })),
             finalize(() => this.isSuggesting.set(false))
-          )
-        ),
+          );
+        }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(response => {
@@ -66,6 +87,17 @@ export class SearchGame {
 
   onQueryChange(value: string) {
     this.query.set(value);
+    const trimmed = value.trim();
+    if (trimmed.length < 3) {
+      this.suggestions.set([]);
+      this.isSuggesting.set(false);
+    } else {
+      const cached = this.getCachedSuggestions(trimmed);
+      if (cached?.length) {
+        this.suggestions.set(cached);
+        this.isSuggesting.set(false);
+      }
+    }
     this.suggestionQuery$.next(value);
   }
 
@@ -92,7 +124,8 @@ export class SearchGame {
       )
       .subscribe({
         next: (response: RawgGamesResponse) => {
-          this.results.set(response.results ?? []);
+          const results = response.results ?? [];
+          this.results.set(results);
         },
         error: () => {
           this.error.set('Errore durante la ricerca. Riprova tra poco.');
@@ -105,22 +138,25 @@ export class SearchGame {
     this.router.navigate(['/game', game.id]);
   }
 
-  async addToBacklog(game: RawgGame) {
-    if (this.addedIds().has(game.id)) {
+  onBacklogActionError(message: string) {
+    this.error.set(message);
+  }
+
+  private setCachedSuggestions(key: string, results: RawgGame[]) {
+    if (this.suggestionsCache.has(key)) {
+      this.suggestionsCache.delete(key);
+    }
+    this.suggestionsCache.set(key, results);
+    if (this.suggestionsCache.size <= SearchGame.SUGGESTIONS_CACHE_LIMIT) {
       return;
     }
-    try {
-      await this.backlogService.addToBacklog(game);
-      this.addedIds.update(current => {
-        const next = new Set(current);
-        next.add(game.id);
-        return next;
-      });
-      this.addAudio.currentTime = 0;
-      void this.addAudio.play().catch(() => undefined);
-    } catch {
-      this.error.set('Non sei autenticato. Effettua il login.');
+    const oldestKey = this.suggestionsCache.keys().next().value;
+    if (oldestKey) {
+      this.suggestionsCache.delete(oldestKey);
     }
   }
 
+  private getCachedSuggestions(query: string) {
+    return this.suggestionsCache.get(query.toLowerCase());
+  }
 }

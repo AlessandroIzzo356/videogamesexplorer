@@ -22,6 +22,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register').then(m => m.Register)
   },
   {
+    path: 'forgot-password',
+    loadComponent: () => import('./features/auth/forgot-password/forgot-password').then(m => m.ForgotPassword)
+  },
+  {
     path: 'search-game',
     loadComponent: () => import('./features/search-game/search-game').then(m => m.SearchGame),
     canMatch: [authGuard]

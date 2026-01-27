@@ -54,14 +54,14 @@
 
     <div class="overlay">
       <div class="actions" role="group" aria-label="Azioni gioco">
-        @if (showAdd) {
+        @if (showAdd && !disableActions) {
           <button
             type="button"
             class="action"
             [class.success]="isAdded"
             [attr.aria-label]="isAdded ? 'Già nel backlog' : 'Aggiungi al backlog'"
             [disabled]="isAdded"
-            (click)="addToBacklog.emit(game)"
+            (click)="handleAdd()"
           >
             @if (isAdded) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -75,12 +75,12 @@
             }
           </button>
         }
-        @if (showRemove) {
+        @if (showRemove && !disableActions) {
           <button
             type="button"
             class="action danger"
             aria-label="Rimuovi dal backlog"
-            (click)="removeFromBacklog.emit(game)"
+            (click)="handleRemove()"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 6l12 12"></path>
@@ -88,12 +88,14 @@
             </svg>
           </button>
         }
-        <a class="action" [routerLink]="['/game', game.id]" aria-label="Vai al dettaglio">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </a>
+        @if (!disableActions) {
+          <a class="action" [routerLink]="['/game', game.id]" aria-label="Vai al dettaglio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </a>
+        }
       </div>
     </div>
   </div>

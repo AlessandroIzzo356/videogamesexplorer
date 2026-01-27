@@ -1,6 +1,5 @@
 export const environment = {
   production: true,
-  rawgApiKey: '64715dedfd1c4639916d6d8552177182',
   firebase: {
   apiKey: "AIzaSyC1zh-va-IrXzr3W8Qbe1J8QI-rwwOOJnY",
   authDomain: "videogamesexplorer.firebaseapp.com",

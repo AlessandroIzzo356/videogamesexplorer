@@ -1,12 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Auth, authState } from '@angular/fire/auth';
-import { Firestore, collection, collectionData, deleteDoc, doc, orderBy, query, serverTimestamp, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, deleteDoc, doc, orderBy, query, serverTimestamp, setDoc, writeBatch } from '@angular/fire/firestore';
 import { RawgGame } from '../models/rawg';
 import { Observable, firstValueFrom, map, of, switchMap, take } from 'rxjs';
 
 interface BacklogEntry {
   game: RawgGame;
   createdAt: unknown;
+  order?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,7 +28,8 @@ export class BacklogService {
       console.log('[backlog] ref', ref.path);
       const payload: BacklogEntry = {
         game,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        order: Date.now()
       };
 
       await setDoc(ref, payload, { merge: true });
@@ -59,7 +61,42 @@ export class BacklogService {
         const ordered = query(ref, orderBy('createdAt', 'desc'));
         return collectionData(ordered) as Observable<BacklogEntry[]>;
       }),
-      map(entries => entries.map(entry => entry.game))
+      map(entries => {
+        const withIndex = entries.map((entry, index) => ({ entry, index }));
+        withIndex.sort((left, right) => {
+          const leftOrder = typeof left.entry.order === 'number' ? left.entry.order : null;
+          const rightOrder = typeof right.entry.order === 'number' ? right.entry.order : null;
+          if (leftOrder !== null && rightOrder !== null) {
+            return leftOrder - rightOrder;
+          }
+          if (leftOrder !== null) {
+            return -1;
+          }
+          if (rightOrder !== null) {
+            return 1;
+          }
+          return left.index - right.index;
+        });
+        return withIndex.map(item => item.entry.game);
+      })
     );
+  }
+
+  async updateOrder(orderedGames: RawgGame[]) {
+    if (!orderedGames.length) {
+      return;
+    }
+    const user = await firstValueFrom(authState(this.auth).pipe(take(1)));
+    const uid = user?.uid;
+    if (!uid) {
+      throw new Error('User not authenticated');
+    }
+
+    const batch = writeBatch(this.firestore);
+    orderedGames.forEach((game, index) => {
+      const ref = doc(this.firestore, `users/${uid}/backlog/${game.id}`);
+      batch.update(ref, { order: index });
+    });
+    await batch.commit();
   }
 }
