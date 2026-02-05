@@ -8,9 +8,58 @@
       </div>
     }
 
-    @if (game.genres.length) {
-      <span class="badge">{{ game.genres[0].name }}</span>
+    @if (resolvedStatus(); as status) {
+      <div class="status-wrap">
+        <button
+          type="button"
+          class="status-badge"
+          [class.is-animate]="isStatusAnimating"
+          [class.in-progress]="status === 'in_progress'"
+          [class.completed]="status === 'completed'"
+          [class.to-play]="status === 'to_play'"
+          [attr.aria-label]="'Stato backlog: ' + statusLabel(status)"
+          (click)="toggleStatusMenu($event)"
+        >
+          <span class="status-icon" aria-hidden="true"></span>
+          {{ statusLabel(status) }}
+        </button>
+        @if (isStatusMenuOpen) {
+          <div class="status-menu" role="menu" aria-label="Cambia stato backlog">
+            <button
+              type="button"
+              role="menuitem"
+              class="status-option in-progress"
+              [class.active]="status === 'in_progress'"
+              (click)="setStatus('in_progress')"
+            >
+              <span class="status-icon" aria-hidden="true"></span>
+              In corso
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              class="status-option completed"
+              [class.active]="status === 'completed'"
+              (click)="setStatus('completed')"
+            >
+              <span class="status-icon" aria-hidden="true"></span>
+              Completato
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              class="status-option to-play"
+              [class.active]="status === 'to_play'"
+              (click)="setStatus('to_play')"
+            >
+              <span class="status-icon" aria-hidden="true"></span>
+              Da giocare
+            </button>
+          </div>
+        }
+      </div>
     }
+
     @if (platformIcons(game).length) {
       <div class="platforms" aria-label="Piattaforme disponibili">
         @for (icon of platformIcons(game); track icon.key) {
@@ -29,6 +78,15 @@
 
     <div class="footer">
       <div class="title">{{ game.name }}</div>
+      @if (game.genres.length) {
+        <div class="genre-row" aria-label="Generi">
+          <span class="genre-pill">{{ game.genres[0].name }}</span>
+          @if (game.genres.length > 1) {
+            <span class="genre-dot" aria-hidden="true">·</span>
+            <span class="genre-pill">{{ game.genres[1].name }}</span>
+          }
+        </div>
+      }
       <div class="info">
         <div class="stars" [attr.aria-label]="'Rating ' + game.rating">
           @for (filled of stars(game.rating); track $index) {
@@ -80,6 +138,9 @@
             type="button"
             class="action danger"
             aria-label="Rimuovi dal backlog"
+            [class.is-disabled]="isStatusMenuOpen"
+            [attr.aria-disabled]="isStatusMenuOpen ? 'true' : null"
+            [disabled]="isStatusMenuOpen"
             (click)="handleRemove()"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -89,7 +150,13 @@
           </button>
         }
         @if (!disableActions) {
-          <a class="action" [routerLink]="['/game', game.id]" aria-label="Vai al dettaglio">
+          <a
+            class="action"
+            [routerLink]="['/game', game.id]"
+            aria-label="Vai al dettaglio"
+            [class.is-disabled]="isStatusMenuOpen"
+            (click)="handleDetailClick($event)"
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path>
               <circle cx="12" cy="12" r="3"></circle>

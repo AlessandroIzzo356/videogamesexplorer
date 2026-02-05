@@ -75,8 +75,26 @@
       <div class="hero-content">
         <div class="hero-top">
           <div class="hero-title">
-            <h1>{{ game()!.name }}</h1>
+            <div class="title-row">
+              <h1>{{ game()!.name }}</h1>
+              <div class="rating" [attr.aria-label]="'Valutazione ' + game()!.rating.toFixed(1) + ' su 5'">
+                @for (status of ratingStars(game()!.rating); track $index) {
+                  <span class="star" [class.filled]="status === 'full'" [class.half]="status === 'half'" aria-hidden="true">★</span>
+                }
+                <span class="rating-value">{{ game()!.rating.toFixed(1) }}</span>
+              </div>
+            </div>
             <div class="meta">Uscita: {{ formatDate(game()!.released) }}</div>
+            @if (companyNames(game()!).length) {
+              <div class="meta">
+                @for (name of companyNames(game()!); track $index) {
+                  @if ($index > 0) {
+                    <span class="meta-sep">•</span>
+                  }
+                  <span>{{ name }}</span>
+                }
+              </div>
+            }
             @if (game()!.genres.length) {
               <div class="genres">
                 @for (genre of game()!.genres.slice(0, 2); track genre.id) {
@@ -179,23 +197,10 @@
       <section class="description">
         <div class="description-header">
           <span>Sinossi</span>
-          @if (shouldClamp(synopsis)) {
-            <button type="button" class="toggle" (click)="toggleDescription()">
-              {{ isDescriptionExpanded() ? 'Mostra meno' : 'Mostra di più' }}
-            </button>
-          }
         </div>
-        <div class="description-body" [class.clamped]="shouldClamp(synopsis) && !isDescriptionExpanded()">
+        <div class="description-body">
           {{ synopsis }}
         </div>
-      </section>
-    }
-
-    @if (game()!.short_screenshots?.length) {
-      <section class="screens">
-        @for (shot of game()!.short_screenshots.slice(0, 3); track shot.id) {
-          <img [src]="shot.image" [alt]="game()!.name + ' screenshot'" loading="lazy" />
-        }
       </section>
     }
   }

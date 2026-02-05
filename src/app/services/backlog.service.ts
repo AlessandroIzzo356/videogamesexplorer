@@ -1,13 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Auth, authState } from '@angular/fire/auth';
-import { Firestore, collection, collectionData, deleteDoc, doc, orderBy, query, serverTimestamp, setDoc, writeBatch } from '@angular/fire/firestore';
-import { RawgGame } from '../models/rawg';
+import { Firestore, collection, collectionData, deleteDoc, doc, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } from '@angular/fire/firestore';
+import { BacklogStatus, RawgGame } from '../models/rawg';
 import { Observable, firstValueFrom, map, of, switchMap, take } from 'rxjs';
 
 interface BacklogEntry {
   game: RawgGame;
   createdAt: unknown;
   order?: number;
+  status?: BacklogStatus;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,7 +30,8 @@ export class BacklogService {
       const payload: BacklogEntry = {
         game,
         createdAt: serverTimestamp(),
-        order: Date.now()
+        order: Date.now(),
+        status: 'to_play'
       };
 
       await setDoc(ref, payload, { merge: true });
@@ -49,6 +51,17 @@ export class BacklogService {
 
     const ref = doc(this.firestore, `users/${uid}/backlog/${gameId}`);
     await deleteDoc(ref);
+  }
+
+  async updateStatus(gameId: number, status: BacklogStatus) {
+    const user = await firstValueFrom(authState(this.auth).pipe(take(1)));
+    const uid = user?.uid;
+    if (!uid) {
+      throw new Error('User not authenticated');
+    }
+
+    const ref = doc(this.firestore, `users/${uid}/backlog/${gameId}`);
+    await updateDoc(ref, { status });
   }
 
   backlog$(): Observable<RawgGame[]> {
@@ -77,7 +90,10 @@ export class BacklogService {
           }
           return left.index - right.index;
         });
-        return withIndex.map(item => item.entry.game);
+        return withIndex.map(item => ({
+          ...item.entry.game,
+          backlogStatus: item.entry.status ?? 'to_play'
+        }));
       })
     );
   }

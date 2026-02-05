@@ -5,8 +5,12 @@ export interface RawgGamesResponse {
   results: RawgGame[];
 }
 
+export type BacklogStatus = 'to_play' | 'in_progress' | 'completed';
+
 export interface RawgGameDetail extends RawgGame {
   description_raw?: string;
+  developers?: RawgCompany[];
+  publishers?: RawgCompany[];
 }
 
 export interface RawgGame {
@@ -22,6 +26,9 @@ export interface RawgGame {
   platforms: RawgPlatformWrapper[];
   parent_platforms?: RawgPlatformWrapper[];
   short_screenshots: RawgScreenshot[];
+  developers?: RawgCompany[];
+  publishers?: RawgCompany[];
+  backlogStatus?: BacklogStatus;
 }
 
 export interface RawgGenre {
@@ -46,6 +53,12 @@ export interface RawgScreenshot {
 }
 
 export interface RawgTag {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface RawgCompany {
   id: number;
   name: string;
   slug: string;

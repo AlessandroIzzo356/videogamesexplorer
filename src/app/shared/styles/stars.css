@@ -1,0 +1,16 @@
+.stars {
+  display: flex;
+  gap: var(--stars-gap, 4px);
+  color: rgba(148, 163, 184, 0.7);
+}
+
+.star {
+  width: var(--star-size, 14px);
+  height: var(--star-size, 14px);
+  fill: none;
+}
+
+.star.filled {
+  color: #fcd34d;
+  fill: currentColor;
+}

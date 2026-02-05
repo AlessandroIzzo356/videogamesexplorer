@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RawgService } from '../../services/rawg.service';
 import { RawgGameDetail } from '../../models/rawg';
 import { formatDate, gameModes, genreNames, platformIcons } from '../../shared/utils';
+import { companyNames, difficultyLabel, formatReason, ratingStars } from '../../shared/game-detail-utils';
 import { BacklogService } from '../../services/backlog.service';
 import { BacklogActionsService } from '../../services/backlog-actions.service';
 import { AiInsightService } from '../../services/ai-insight.service';
@@ -32,44 +33,17 @@ export class GameDetail {
   aiLoading = signal(false);
   seriesLoading = signal(false);
   franchise = signal<string | null>(null);
-  isDescriptionExpanded = signal(false);
   isInBacklog = signal(false);
   private backlogIds = signal(new Set<number>());
   protected readonly formatDate = formatDate;
   protected readonly platformIcons = platformIcons;
   protected readonly genreNames = genreNames;
   protected readonly gameModes = gameModes;
-  protected readonly difficultyLabel = (value?: AiInsight['difficolta']) => {
-    const normalized = value?.toLowerCase().trim();
-    if (!normalized) {
-      return 'N/D';
-    }
-    if (normalized.includes('facile') || normalized.includes('easy')) {
-      return 'Facile';
-    }
-    if (normalized.includes('media') || normalized.includes('medium')) {
-      return 'Media';
-    }
-    if (normalized.includes('difficile') || normalized.includes('hard')) {
-      return 'Difficile';
-    }
-    return value;
-  };
+  protected readonly difficultyLabel = difficultyLabel;
+  protected readonly ratingStars = ratingStars;
+  protected readonly companyNames = companyNames;
+  protected readonly formatReason = formatReason;
 
-  protected readonly formatReason = (value?: string) => {
-    if (!value) {
-      return '';
-    }
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return '';
-    }
-    return trimmed[0].toUpperCase() + trimmed.slice(1);
-  };
-
-  protected readonly shouldClamp = (text?: string | null) => {
-    return (text ?? '').trim().length > 300;
-  };
 
   constructor() {
     this.route.paramMap
@@ -89,10 +63,6 @@ export class GameDetail {
         this.backlogIds.set(new Set(games.map(game => game.id)));
         this.updateBacklogState();
       });
-  }
-
-  toggleDescription() {
-    this.isDescriptionExpanded.update(value => !value);
   }
 
   async addToBacklog() {
@@ -174,6 +144,8 @@ export class GameDetail {
     this.aiError.set(null);
 
     const payload = {
+      gameId: game.id,
+      gameName: game.name,
       name: game.name,
       released: game.released,
       genres: game.genres?.map(genre => genre.name) ?? [],

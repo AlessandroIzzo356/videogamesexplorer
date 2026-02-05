@@ -1,3 +1,5 @@
+@import "../styles/stars.css";
+
 .card {
   border-radius: 16px;
   overflow: hidden;
@@ -66,9 +68,177 @@
   border: 1px solid rgba(148, 163, 184, 0.3);
   color: #e2e8f0;
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
+  font-weight: 500;
+  letter-spacing: 0;
   backdrop-filter: blur(6px);
+}
+
+.status-wrap {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  pointer-events: auto;
+  max-width: calc(100% - 96px);
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 18px rgba(2, 6, 23, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+
+.status-badge.is-animate {
+  animation: statusPulse 0.5s ease;
+}
+
+.status-award {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  font-size: 11px;
+}
+
+.status-icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 2px rgba(2, 6, 23, 0.15);
+  display: inline-block;
+}
+
+.status-badge.completed .status-icon {
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+}
+
+.status-badge.completed .status-icon::before {
+  content: "★";
+  font-size: 12px;
+  line-height: 1;
+  display: inline-block;
+}
+
+.status-badge.in-progress {
+  background: rgba(245, 158, 11, 0.9);
+  border-color: rgba(251, 191, 36, 0.9);
+  color: #1f1300;
+}
+
+.status-badge.to-play {
+  background: rgba(71, 85, 105, 0.75);
+  border-color: rgba(148, 163, 184, 0.7);
+  color: #e2e8f0;
+}
+
+.status-badge.completed {
+  background: rgba(34, 197, 94, 0.7);
+  border-color: rgba(134, 239, 172, 0.9);
+  color: #f0fdf4;
+  box-shadow: 0 10px 18px rgba(16, 185, 129, 0.35), 0 0 0 1px rgba(52, 211, 153, 0.2);
+}
+
+.status-menu {
+  margin-top: 8px;
+  min-width: 190px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 18px 28px rgba(2, 6, 23, 0.4);
+  backdrop-filter: blur(8px);
+  display: grid;
+  gap: 6px;
+}
+
+.status-menu button {
+  border: 1px solid transparent;
+  background: rgba(30, 41, 59, 0.8);
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-menu button.active {
+  border-color: rgba(148, 163, 184, 0.45);
+  background: rgba(51, 65, 85, 0.9);
+}
+
+.status-menu button:hover {
+  background: rgba(71, 85, 105, 0.9);
+}
+
+.status-option.in-progress .status-icon {
+  background: #f59e0b;
+}
+
+.status-option.to-play .status-icon {
+  background: #94a3b8;
+}
+
+.status-option.completed .status-icon {
+  background: #22c55e;
+}
+
+@keyframes statusPulse {
+  0% {
+    opacity: 0.7;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.25);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 14px 26px rgba(16, 185, 129, 0.35);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.genre-row {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #cbd5f5;
+}
+
+.genre-pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  color: #dce8ff;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+}
+
+.genre-dot {
+  color: rgba(203, 213, 245, 0.75);
+  font-size: 12px;
 }
 
 .platforms {
@@ -136,20 +306,8 @@
 }
 
 .stars {
-  display: flex;
-  gap: 4px;
-  color: rgba(148, 163, 184, 0.7);
-}
-
-.star {
-  width: 14px;
-  height: 14px;
-  fill: none;
-}
-
-.star.filled {
-  color: #fcd34d;
-  fill: currentColor;
+  --stars-gap: 4px;
+  --star-size: 14px;
 }
 
 .overlay {

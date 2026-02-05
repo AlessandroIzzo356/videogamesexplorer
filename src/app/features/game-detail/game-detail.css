@@ -31,15 +31,15 @@
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(148, 163, 184, 0.12);
   box-shadow: 0 16px 36px rgba(2, 6, 23, 0.35);
-  min-height: 260px;
+  min-height: 200px;
 }
 
 .hero-content {
-  padding: 22px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  min-height: 260px;
+  gap: 14px;
+  min-height: 0;
 }
 
 .hero h1 {
@@ -50,6 +50,11 @@
 .meta {
   color: #cbd5f5;
   font-size: 13px;
+  line-height: 1.4;
+}
+
+.meta + .meta {
+  margin-top: 4px;
 }
 
 .hero-top {
@@ -61,6 +66,49 @@
 
 .hero-title {
   max-width: 70%;
+}
+
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #cbd5f5;
+}
+
+.star {
+  font-size: 14px;
+  color: rgba(148, 163, 184, 0.5);
+}
+
+.star.filled {
+  color: #fbbf24;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.35);
+}
+
+.star.half {
+  color: transparent;
+  background: linear-gradient(90deg, #fbbf24 50%, rgba(148, 163, 184, 0.5) 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.rating-value {
+  margin-left: 6px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.meta-sep {
+  margin: 0 6px;
+  color: rgba(148, 163, 184, 0.7);
 }
 
 .platforms {

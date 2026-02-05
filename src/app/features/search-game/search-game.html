@@ -51,6 +51,7 @@
         <app-game-card
           [game]="game"
           [isAdded]="addedIds().has(game.id)"
+          [backlogStatus]="statusById().get(game.id)"
           [useBacklogActions]="true"
           (actionError)="onBacklogActionError($event)"
         ></app-game-card>

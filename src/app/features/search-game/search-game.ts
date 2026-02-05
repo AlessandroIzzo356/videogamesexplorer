@@ -6,7 +6,7 @@ import { RawgService } from '../../services/rawg.service';
 import { GameCard } from '../../shared/game-card/game-card';
 import { Loading } from '../../shared/loading/loading';
 import { GameSuggestions } from '../../shared/game-suggestions/game-suggestions';
-import { RawgGame, RawgGamesResponse } from '../../models/rawg';
+import { BacklogStatus, RawgGame, RawgGamesResponse } from '../../models/rawg';
 import { BacklogService } from '../../services/backlog.service';
 
 @Component({
@@ -33,13 +33,22 @@ export class SearchGame {
   isSuggesting = signal(false);
   error = signal<string | null>(null);
   addedIds = signal(new Set<number>());
+  statusById = signal(new Map<number, BacklogStatus>());
 
   constructor() {
     this.backlogService.backlog$()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(games => {
-        const next = new Set(games.map(game => game.id));
-        this.addedIds.set(next);
+        const nextIds = new Set<number>();
+        const nextStatus = new Map<number, BacklogStatus>();
+        games.forEach(game => {
+          nextIds.add(game.id);
+          if (game.backlogStatus) {
+            nextStatus.set(game.id, game.backlogStatus);
+          }
+        });
+        this.addedIds.set(nextIds);
+        this.statusById.set(nextStatus);
       });
     this.suggestionQuery$
       .pipe(

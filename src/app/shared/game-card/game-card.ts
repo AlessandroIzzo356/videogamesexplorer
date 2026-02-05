@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { RawgGame } from '../../models/rawg';
+import { BacklogStatus, RawgGame } from '../../models/rawg';
 import { formatDate, platformIcons, stars } from '../utils';
 import { BacklogActionsService } from '../../services/backlog-actions.service';
 @Component({
@@ -10,13 +10,14 @@ import { BacklogActionsService } from '../../services/backlog-actions.service';
   templateUrl: './game-card.html',
   styleUrl: './game-card.css'
 })
-export class GameCard {
+export class GameCard implements OnChanges {
   @Input({ required: true }) game!: RawgGame;
   @Input() showAdd = true;
   @Input() isAdded = false;
   @Input() showRemove = false;
   @Input() disableActions = false;
   @Input() useBacklogActions = false;
+  @Input() backlogStatus?: BacklogStatus;
   @Output() addToBacklog = new EventEmitter<RawgGame>();
   @Output() removeFromBacklog = new EventEmitter<RawgGame>();
   @Output() actionError = new EventEmitter<string>();
@@ -24,6 +25,19 @@ export class GameCard {
   protected readonly formatDate = formatDate;
   protected readonly stars = stars;
   protected readonly platformIcons = platformIcons;
+  isStatusMenuOpen = false;
+  isStatusAnimating = false;
+  private lastStatus: BacklogStatus | null = null;
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['backlogStatus'] || changes['game']) {
+      const current = this.resolvedStatus();
+      if (current && this.lastStatus && current !== this.lastStatus) {
+        this.triggerStatusFeedback();
+      }
+      this.lastStatus = current;
+    }
+  }
 
   async handleAdd() {
     if (this.disableActions) {
@@ -53,12 +67,81 @@ export class GameCard {
     }
   }
 
-  private getErrorMessage(reason: 'auth' | 'error', action: 'add' | 'remove') {
+  toggleStatusMenu(event: Event) {
+    event.stopPropagation();
+    if (this.disableActions || !this.resolvedStatus()) {
+      return;
+    }
+    this.isStatusMenuOpen = !this.isStatusMenuOpen;
+  }
+
+  async setStatus(status: BacklogStatus) {
+    this.isStatusMenuOpen = false;
+    if (this.disableActions || !this.game?.id) {
+      return;
+    }
+    const previous = this.resolvedStatus();
+    if (!this.useBacklogActions) {
+      this.backlogStatus = status;
+      return;
+    }
+    const result = await this.backlogActions.updateStatus(this.game.id, status);
+    if (!result.ok) {
+      this.actionError.emit(this.getErrorMessage(result.reason, 'status'));
+      return;
+    }
+    this.backlogStatus = status;
+    if (previous !== status) {
+      if (status === 'in_progress') {
+        this.backlogActions.playInProgressSound();
+      } else if (status === 'completed') {
+        this.backlogActions.playCompletedSound();
+      } else if (status === 'to_play') {
+        this.backlogActions.playToPlaySound();
+      }
+    }
+    if (previous && previous !== status) {
+      this.triggerStatusFeedback();
+    }
+  }
+
+  handleDetailClick(event: Event) {
+    if (this.isStatusMenuOpen) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  resolvedStatus() {
+    return this.backlogStatus ?? this.game?.backlogStatus ?? null;
+  }
+
+  statusLabel(status: BacklogStatus) {
+    if (status === 'in_progress') {
+      return 'In corso';
+    }
+    if (status === 'completed') {
+      return 'Completato';
+    }
+    return 'Da giocare';
+  }
+
+  private triggerStatusFeedback() {
+    this.isStatusAnimating = true;
+    setTimeout(() => {
+      this.isStatusAnimating = false;
+    }, 520);
+  }
+
+
+  private getErrorMessage(reason: 'auth' | 'error', action: 'add' | 'remove' | 'status') {
     if (reason === 'auth') {
       return 'Non sei autenticato. Effettua il login.';
     }
     return action === 'add'
       ? 'Errore durante il salvataggio nel backlog.'
-      : 'Errore durante la rimozione dal backlog.';
+      : action === 'remove'
+        ? 'Errore durante la rimozione dal backlog.'
+        : 'Errore durante l\'aggiornamento dello stato.';
   }
 }

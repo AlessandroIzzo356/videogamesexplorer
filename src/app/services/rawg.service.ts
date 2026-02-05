@@ -7,12 +7,16 @@ export class RawgService {
   private http = inject(HttpClient);
   private baseUrl = 'https://rawg-proxy.sparkling-math-dc03.workers.dev';
 
-  searchGames(query: string, pageSize = 10) {
+  searchGames(query: string, pageSize = 10, metacritic?: string) {
+    const params: Record<string, string> = {
+      q: query,
+      page_size: String(pageSize)
+    };
+    if (metacritic) {
+      params['metacritic'] = metacritic;
+    }
     return this.http.get<RawgGamesResponse>(`${this.baseUrl}/rawg/search`, {
-      params: {
-        q: query,
-        page_size: pageSize
-      }
+      params
     });
   }
 
