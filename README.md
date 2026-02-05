@@ -65,6 +65,28 @@ Verifica che il progetto Firebase abbia:
 - Authentication abilitata (Email/Password)
 - Firestore attivo
 
+### Firestore Rules
+
+Le regole sono definite in `firestore.rules` e collegate in `firebase.json`.
+
+Deploy regole:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+Schema dati rilevante:
+
+- `users/{uid}/backlog/{gameId}`: backlog privato (owner-only)
+- `users/{uid}/ai_insights/{rawgId}`: cache insight AI per-utente (owner-only)
+- `ai_insights/{rawgId}`: collezione globale lasciata in sola lettura client
+
+### Security notes
+
+- La cache AI e per-utente per evitare che client autenticati possano alterare insight condivisi globali.
+- Le scritture sui dati utente sono consentite solo al proprietario (`request.auth.uid == userId`).
+- E presente una regola `deny all` finale per bloccare ogni path non esplicitamente autorizzato.
+
 ## Backend proxy (Cloudflare Worker)
 
 Cartella: `server/wrangler-proxy`

@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Auth, authState } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, serverTimestamp, setDoc } from '@angular/fire/firestore';
-import { catchError, from, map, of, switchMap } from 'rxjs';
+import { catchError, from, map, of, switchMap, take } from 'rxjs';
 import { AiInsight } from '../models/ai-insight';
 
 export type AiInsightRequest = {
@@ -17,37 +18,52 @@ export type AiInsightRequest = {
 @Injectable({ providedIn: 'root' })
 export class AiInsightService {
   private http = inject(HttpClient);
+  private auth = inject(Auth);
   private firestore = inject(Firestore);
   private baseUrl = 'https://rawg-proxy.sparkling-math-dc03.workers.dev';
   private model = 'gpt-4.1-mini';
   private promptVersion = 'v2';
 
   getInsight(payload: AiInsightRequest) {
-    const ref = doc(this.firestore, `ai_insights/${payload.gameId}`);
-    return from(getDoc(ref)).pipe(
-      catchError(() => of(null)),
+    return authState(this.auth).pipe(
+      take(1),
       switchMap(snapshot => {
-        if (snapshot?.exists()) {
-          return of(snapshot.data() as AiInsight);
+        const uid = snapshot?.uid;
+        if (!uid) {
+          return this.requestInsight(payload);
         }
 
-        return this.http.post<AiInsight>(`${this.baseUrl}/ai/insight`, payload).pipe(
+        const ref = doc(this.firestore, `users/${uid}/ai_insights/${payload.gameId}`);
+        return from(getDoc(ref)).pipe(
+          catchError(() => of(null)),
           switchMap(insight => {
-            const record = {
-              gameId: payload.gameId,
-              gameName: payload.gameName,
-              generatedAt: serverTimestamp(),
-              model: this.model,
-              promptVersion: this.promptVersion,
-              ...insight
-            };
-            return from(setDoc(ref, record)).pipe(
-              map(() => insight),
-              catchError(() => of(insight))
+            if (insight?.exists()) {
+              return of(insight.data() as AiInsight);
+            }
+
+            return this.requestInsight(payload).pipe(
+              switchMap(result => {
+                const record = {
+                  gameId: payload.gameId,
+                  gameName: payload.gameName,
+                  generatedAt: serverTimestamp(),
+                  model: this.model,
+                  promptVersion: this.promptVersion,
+                  ...result
+                };
+                return from(setDoc(ref, record)).pipe(
+                  map(() => result),
+                  catchError(() => of(result))
+                );
+              })
             );
           })
         );
       })
     );
+  }
+
+  private requestInsight(payload: AiInsightRequest) {
+    return this.http.post<AiInsight>(`${this.baseUrl}/ai/insight`, payload);
   }
 }
