@@ -43,6 +43,8 @@ export class GameDetail {
   protected readonly ratingStars = ratingStars;
   protected readonly companyNames = companyNames;
   protected readonly formatReason = formatReason;
+  protected readonly resolveMode = this.getResolvedMode.bind(this);
+  protected readonly resolveFranchise = this.getResolvedFranchise.bind(this);
 
 
   constructor() {
@@ -123,8 +125,7 @@ export class GameDetail {
         next: game => {
           this.game.set(game);
           this.updateBacklogState();
-          this.fetchAiInsight(game);
-          this.fetchSeries(game);
+          this.fetchSeriesAndAi(game);
         },
         error: () => this.error.set('Errore nel caricamento del dettaglio.')
       });
@@ -139,7 +140,7 @@ export class GameDetail {
     this.isInBacklog.set(this.backlogIds().has(currentId));
   }
 
-  private fetchAiInsight(game: RawgGameDetail) {
+  private fetchAiInsight(game: RawgGameDetail, franchiseName?: string | null) {
     this.aiLoading.set(true);
     this.aiError.set(null);
 
@@ -150,7 +151,9 @@ export class GameDetail {
       released: game.released,
       genres: game.genres?.map(genre => genre.name) ?? [],
       platforms: game.platforms?.map(platform => platform.platform.name) ?? [],
-      description: game.description_raw ?? ''
+      description: game.description_raw ?? '',
+      modalita: gameModes(game),
+      franchise: franchiseName ?? null
     };
 
     this.aiInsightService.getInsight(payload)
@@ -164,7 +167,7 @@ export class GameDetail {
       });
   }
 
-  private fetchSeries(game: RawgGameDetail) {
+  private fetchSeriesAndAi(game: RawgGameDetail) {
     this.seriesLoading.set(true);
     this.rawg.getGameSeries(String(game.id), game.name)
       .pipe(
@@ -172,9 +175,31 @@ export class GameDetail {
         finalize(() => this.seriesLoading.set(false))
       )
       .subscribe({
-        next: response => this.franchise.set(response.franchise),
-        error: () => this.franchise.set(null)
+        next: response => {
+          this.franchise.set(response.franchise);
+          this.fetchAiInsight(game, response.franchise);
+        },
+        error: () => {
+          this.franchise.set(null);
+          this.fetchAiInsight(game, null);
+        }
       });
+  }
+
+  private getResolvedMode(game: RawgGameDetail, insight: AiInsight | null) {
+    const sourceMode = gameModes(game);
+    if (sourceMode !== 'N/D') {
+      return sourceMode;
+    }
+    return insight?.modalita?.trim() || 'N/D';
+  }
+
+  private getResolvedFranchise(rawgFranchise: string | null, insight: AiInsight | null) {
+    if (rawgFranchise?.trim()) {
+      return rawgFranchise;
+    }
+    const aiFranchise = insight?.franchise?.trim();
+    return aiFranchise && aiFranchise !== 'N/D' ? aiFranchise : null;
   }
 
 }

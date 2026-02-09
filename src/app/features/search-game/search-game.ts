@@ -1,18 +1,19 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, Subject, debounceTime, distinctUntilChanged, map, of, switchMap, catchError, tap } from 'rxjs';
+import { finalize, Subject, distinctUntilChanged, map, of, switchMap, catchError, tap } from 'rxjs';
 import { RawgService } from '../../services/rawg.service';
 import { GameCard } from '../../shared/game-card/game-card';
 import { Loading } from '../../shared/loading/loading';
 import { GameSuggestions } from '../../shared/game-suggestions/game-suggestions';
+import { SearchInput } from '../../shared/search-input/search-input';
 import { BacklogStatus, RawgGame, RawgGamesResponse } from '../../models/rawg';
 import { BacklogService } from '../../services/backlog.service';
 
 @Component({
   selector: 'app-search-game',
   standalone: true,
-  imports: [GameCard, Loading, GameSuggestions],
+  imports: [GameCard, Loading, GameSuggestions, SearchInput],
   templateUrl: './search-game.html',
   styleUrl: './search-game.css'
 })
@@ -52,7 +53,6 @@ export class SearchGame {
       });
     this.suggestionQuery$
       .pipe(
-        debounceTime(400),
         map(value => value.trim()),
         distinctUntilChanged(),
         switchMap(value => {
@@ -94,19 +94,11 @@ export class SearchGame {
       });
   }
 
-  onQueryChange(value: string) {
+  onQueryInput(value: string) {
     this.query.set(value);
-    const trimmed = value.trim();
-    if (trimmed.length < 3) {
-      this.suggestions.set([]);
-      this.isSuggesting.set(false);
-    } else {
-      const cached = this.getCachedSuggestions(trimmed);
-      if (cached?.length) {
-        this.suggestions.set(cached);
-        this.isSuggesting.set(false);
-      }
-    }
+  }
+
+  onSuggestionQueryChange(value: string) {
     this.suggestionQuery$.next(value);
   }
 

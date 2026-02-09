@@ -180,15 +180,15 @@
 
     <section class="pills">
       <div class="pill-card">⏱ Durata stimata: <strong>{{ aiInsight()?.durata_stimata ?? (game()!.playtime ? game()!.playtime + 'h' : 'N/D') }}</strong></div>
-      <div class="pill-card">🎮 Modalità: <strong>{{ gameModes(game()!) }}</strong></div>
+      <div class="pill-card">🎮 Modalità: <strong>{{ resolveMode(game()!, aiInsight()) }}</strong></div>
       <div class="pill-card">
         🎯 Difficoltà stimata: <strong>{{ difficultyLabel(aiInsight()?.difficolta) }}</strong>
         @if (aiInsight()?.perche_difficile) {
           <div class="pill-note">{{ formatReason(aiInsight()!.perche_difficile) }}</div>
         }
       </div>
-      @if (franchise()) {
-        <div class="pill-card">📦 Serie / franchise: <strong>{{ franchise() }}</strong></div>
+      @if (resolveFranchise(franchise(), aiInsight()); as franchiseName) {
+        <div class="pill-card">📦 Serie / franchise: <strong>{{ franchiseName }}</strong></div>
       }
       <div class="pill-card">🏷️ Tag principali: <strong>{{ genreNames(game()!) }}</strong></div>
     </section>

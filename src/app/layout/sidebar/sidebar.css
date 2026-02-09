@@ -4,9 +4,9 @@
 }
 
 .sidebar {
-  width: 260px;
+  width: var(--sidebar-width);
   height: 100vh;
-  padding: 24px 18px;
+  padding: var(--sidebar-pad-y) var(--sidebar-pad-x);
   box-sizing: border-box;
   background: transparent;
   color: #e5e7eb;
@@ -188,8 +188,8 @@
 }
 
 .sidebar.collapsed {
-  width: 86px;
-  padding: 24px 12px;
+  width: var(--sidebar-collapsed-width);
+  padding: var(--sidebar-collapsed-pad-y) var(--sidebar-collapsed-pad-x);
 }
 
 .sidebar.collapsed .brand {
@@ -224,4 +224,78 @@
 
 .sidebar.collapsed .nav-item .icon {
   margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .brand {
+    font-size: 17px;
+  }
+
+  .nav-item {
+    padding: 9px 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .collapse-toggle {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+
+  .brand {
+    justify-content: center;
+  }
+
+  .brand-title {
+    display: none;
+  }
+
+  .user-chip {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .nav-item {
+    justify-content: center;
+  }
+
+  .nav-item .label,
+  .nav-item .pill {
+    display: none;
+  }
+
+  .nav-item .icon {
+    margin: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .nav-item {
+    padding: 8px;
+  }
+
+  .nav-item .icon,
+  .nav-item .icon svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 320px) {
+  .nav-item {
+    padding: 7px;
+  }
+
+  .nav-item .icon,
+  .nav-item .icon svg {
+    width: 14px;
+    height: 14px;
+  }
 }

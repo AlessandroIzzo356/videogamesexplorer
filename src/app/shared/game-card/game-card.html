@@ -1,62 +1,62 @@
-<article class="card">
+<article class="card" [class.menu-open]="isStatusMenuOpen">
+  @if (resolvedStatus(); as status) {
+    <div class="status-wrap">
+      <button
+        type="button"
+        class="status-badge"
+        [class.is-animate]="isStatusAnimating"
+        [class.in-progress]="status === 'in_progress'"
+        [class.completed]="status === 'completed'"
+        [class.to-play]="status === 'to_play'"
+        [attr.aria-label]="'Stato backlog: ' + statusLabel(status)"
+        (click)="toggleStatusMenu($event)"
+      >
+        <span class="status-icon" aria-hidden="true"></span>
+        {{ statusLabel(status) }}
+      </button>
+      @if (isStatusMenuOpen) {
+        <div class="status-menu" role="menu" aria-label="Cambia stato backlog">
+          <button
+            type="button"
+            role="menuitem"
+            class="status-option in-progress"
+            [class.active]="status === 'in_progress'"
+            (click)="setStatus('in_progress')"
+          >
+            <span class="status-icon" aria-hidden="true"></span>
+            In corso
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            class="status-option completed"
+            [class.active]="status === 'completed'"
+            (click)="setStatus('completed')"
+          >
+            <span class="status-icon" aria-hidden="true"></span>
+            Completato
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            class="status-option to-play"
+            [class.active]="status === 'to_play'"
+            (click)="setStatus('to_play')"
+          >
+            <span class="status-icon" aria-hidden="true"></span>
+            Da giocare
+          </button>
+        </div>
+      }
+    </div>
+  }
+
   <div class="media">
     @if (game.background_image) {
       <img [src]="game.background_image" [alt]="game.name" loading="lazy" />
     } @else {
       <div class="media-fallback">
         <span class="fallback-subtitle">Nessuna immagine</span>
-      </div>
-    }
-
-    @if (resolvedStatus(); as status) {
-      <div class="status-wrap">
-        <button
-          type="button"
-          class="status-badge"
-          [class.is-animate]="isStatusAnimating"
-          [class.in-progress]="status === 'in_progress'"
-          [class.completed]="status === 'completed'"
-          [class.to-play]="status === 'to_play'"
-          [attr.aria-label]="'Stato backlog: ' + statusLabel(status)"
-          (click)="toggleStatusMenu($event)"
-        >
-          <span class="status-icon" aria-hidden="true"></span>
-          {{ statusLabel(status) }}
-        </button>
-        @if (isStatusMenuOpen) {
-          <div class="status-menu" role="menu" aria-label="Cambia stato backlog">
-            <button
-              type="button"
-              role="menuitem"
-              class="status-option in-progress"
-              [class.active]="status === 'in_progress'"
-              (click)="setStatus('in_progress')"
-            >
-              <span class="status-icon" aria-hidden="true"></span>
-              In corso
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              class="status-option completed"
-              [class.active]="status === 'completed'"
-              (click)="setStatus('completed')"
-            >
-              <span class="status-icon" aria-hidden="true"></span>
-              Completato
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              class="status-option to-play"
-              [class.active]="status === 'to_play'"
-              (click)="setStatus('to_play')"
-            >
-              <span class="status-icon" aria-hidden="true"></span>
-              Da giocare
-            </button>
-          </div>
-        }
       </div>
     }
 

@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
 import { RouterLink } from '@angular/router';
 import { BacklogStatus, RawgGame } from '../../models/rawg';
 import { formatDate, platformIcons, stars } from '../utils';
@@ -10,7 +11,8 @@ import { BacklogActionsService } from '../../services/backlog-actions.service';
   templateUrl: './game-card.html',
   styleUrl: './game-card.css'
 })
-export class GameCard implements OnChanges {
+export class GameCard implements OnChanges, OnDestroy {
+  private static readonly menuEvents = new Subject<string | null>();
   @Input({ required: true }) game!: RawgGame;
   @Input() showAdd = true;
   @Input() isAdded = false;
@@ -28,6 +30,18 @@ export class GameCard implements OnChanges {
   isStatusMenuOpen = false;
   isStatusAnimating = false;
   private lastStatus: BacklogStatus | null = null;
+  private menuSub: Subscription;
+
+  constructor() {
+    this.menuSub = GameCard.menuEvents.subscribe(openId => {
+      if (!this.isStatusMenuOpen) {
+        return;
+      }
+      if (openId !== this.menuKey()) {
+        this.isStatusMenuOpen = false;
+      }
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['backlogStatus'] || changes['game']) {
@@ -37,6 +51,10 @@ export class GameCard implements OnChanges {
       }
       this.lastStatus = current;
     }
+  }
+
+  ngOnDestroy() {
+    this.menuSub?.unsubscribe();
   }
 
   async handleAdd() {
@@ -72,7 +90,11 @@ export class GameCard implements OnChanges {
     if (this.disableActions || !this.resolvedStatus()) {
       return;
     }
-    this.isStatusMenuOpen = !this.isStatusMenuOpen;
+    const willOpen = !this.isStatusMenuOpen;
+    this.isStatusMenuOpen = willOpen;
+    if (willOpen) {
+      GameCard.menuEvents.next(this.menuKey());
+    }
   }
 
   async setStatus(status: BacklogStatus) {
@@ -131,6 +153,10 @@ export class GameCard implements OnChanges {
     setTimeout(() => {
       this.isStatusAnimating = false;
     }, 520);
+  }
+
+  private menuKey() {
+    return String(this.game?.id ?? this.game?.name ?? '');
   }
 
 

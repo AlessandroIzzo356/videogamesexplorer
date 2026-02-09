@@ -13,6 +13,8 @@ export type AiInsightRequest = {
   genres?: string[] | null;
   platforms?: string[] | null;
   description?: string | null;
+  modalita?: string | null;
+  franchise?: string | null;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -22,7 +24,7 @@ export class AiInsightService {
   private firestore = inject(Firestore);
   private baseUrl = 'https://rawg-proxy.sparkling-math-dc03.workers.dev';
   private model = 'gpt-4.1-mini';
-  private promptVersion = 'v2';
+  private promptVersion = 'v3';
 
   getInsight(payload: AiInsightRequest) {
     return authState(this.auth).pipe(
@@ -38,7 +40,10 @@ export class AiInsightService {
           catchError(() => of(null)),
           switchMap(insight => {
             if (insight?.exists()) {
-              return of(insight.data() as AiInsight);
+              const cached = insight.data() as AiInsight & { promptVersion?: string };
+              if (cached.promptVersion === this.promptVersion) {
+                return of(cached);
+              }
             }
 
             return this.requestInsight(payload).pipe(

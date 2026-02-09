@@ -1,13 +1,13 @@
 .backlog-page {
   max-width: 900px;
   margin: 0 auto;
-  padding: 20px 10px 40px;
+  padding: var(--page-pad-top) var(--page-pad-x) var(--page-pad-bottom);
   color: #e5e7eb;
 }
 
 .backlog-hero h1 {
   margin: 0 0 6px;
-  font-size: 30px;
+  font-size: var(--backlog-h1-size);
   font-weight: 600;
   letter-spacing: -0.2px;
 }
@@ -15,7 +15,7 @@
 .backlog-hero p {
   margin: 0 0 18px;
   color: #a1a1aa;
-  font-size: 14.5px;
+  font-size: var(--backlog-p-size);
 }
 
 .backlog-hero-row {
@@ -31,11 +31,16 @@
   align-items: center;
   gap: 12px;
   color: #e0e7ff;
-  font-size: 12.5px;
+  font-size: var(--backlog-toggle-font);
   font-weight: 600;
   letter-spacing: 0.2px;
   cursor: pointer;
   user-select: none;
+}
+
+.reorder-toggle.is-disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .reorder-toggle input {
@@ -50,8 +55,8 @@
 
 .toggle-track {
   position: relative;
-  width: 46px;
-  height: 26px;
+  width: var(--backlog-toggle-track-w);
+  height: var(--backlog-toggle-track-h);
   border-radius: 999px;
   background: rgba(100, 116, 139, 0.4);
   border: 1px solid rgba(148, 163, 184, 0.4);
@@ -64,8 +69,8 @@
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 20px;
-  height: 20px;
+  width: var(--backlog-toggle-knob);
+  height: var(--backlog-toggle-knob);
   border-radius: 999px;
   background: #f8fafc;
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
@@ -78,7 +83,7 @@
 }
 
 .reorder-toggle input:checked + .toggle-track::after {
-  transform: translateX(20px);
+  transform: translateX(calc(var(--backlog-toggle-track-w) - var(--backlog-toggle-knob) - 4px));
 }
 
 .backlog-grid {
@@ -86,6 +91,42 @@
   gap: 12px;
   grid-template-columns: repeat(3, minmax(220px, 1fr));
   justify-content: start;
+}
+
+.filters-row {
+  margin: 12px 0 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-chip {
+  height: var(--backlog-chip-h);
+  padding: 0 var(--backlog-chip-pad-x);
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(30, 41, 59, 0.75);
+  color: #cbd5e1;
+  font-size: var(--backlog-chip-font);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.status-chip:hover {
+  border-color: rgba(129, 140, 248, 0.6);
+}
+
+.status-chip.active {
+  border-color: rgba(129, 140, 248, 0.9);
+  background: linear-gradient(120deg, rgba(59, 130, 246, 0.32), rgba(99, 102, 241, 0.42));
+  color: #e0e7ff;
 }
 
 .backlog-item {
@@ -204,4 +245,40 @@
   background: rgba(15, 23, 42, 0.5);
   color: #cbd5f5;
   font-size: 14px;
+}
+
+@media (max-width: 840px) {
+  .backlog-grid {
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 580px) {
+  .backlog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .backlog-hero-row {
+    gap: 10px;
+  }
+
+  .filters-row {
+    margin: 10px 0 14px;
+    gap: 10px;
+  }
+
+  .backlog-grid {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .status-chips {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 320px) {
 }

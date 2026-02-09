@@ -11,6 +11,12 @@ interface BacklogEntry {
   status?: BacklogStatus;
 }
 
+const STATUS_PRIORITY: Record<BacklogStatus, number> = {
+  in_progress: 0,
+  to_play: 1,
+  completed: 2
+};
+
 @Injectable({ providedIn: 'root' })
 export class BacklogService {
   private auth = inject(Auth);
@@ -77,6 +83,15 @@ export class BacklogService {
       map(entries => {
         const withIndex = entries.map((entry, index) => ({ entry, index }));
         withIndex.sort((left, right) => {
+          const leftStatus = left.entry.status ?? 'to_play';
+          const rightStatus = right.entry.status ?? 'to_play';
+          const leftPriority = STATUS_PRIORITY[leftStatus];
+          const rightPriority = STATUS_PRIORITY[rightStatus];
+
+          if (leftPriority !== rightPriority) {
+            return leftPriority - rightPriority;
+          }
+
           const leftOrder = typeof left.entry.order === 'number' ? left.entry.order : null;
           const rightOrder = typeof right.entry.order === 'number' ? right.entry.order : null;
           if (leftOrder !== null && rightOrder !== null) {

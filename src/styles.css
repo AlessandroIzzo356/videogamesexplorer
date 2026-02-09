@@ -1,4 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+@import "./styles/responsive.css";
+
 :root {
   color-scheme: light;
   --page-bg: radial-gradient(1200px 600px at 10% 0%, rgba(59, 130, 246, 0.15), transparent 60%),

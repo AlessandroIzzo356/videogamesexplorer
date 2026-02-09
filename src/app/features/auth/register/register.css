@@ -21,7 +21,7 @@
   max-width: 420px;
   background: rgba(15, 23, 42, 0.7);
   border-radius: 20px;
-  padding: 22px;
+  padding: var(--auth-card-pad);
   border: 1px solid rgba(148, 163, 184, 0.18);
   box-shadow: 0 24px 60px rgba(2, 6, 23, 0.4);
   position: relative;
@@ -47,7 +47,7 @@
 
 .register-header h1 {
   margin: 8px 0 6px;
-  font-size: 28px;
+  font-size: var(--auth-h1-size);
   font-weight: 600;
   letter-spacing: -0.3px;
 }
@@ -179,15 +179,5 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 600px) {
-  .register-card {
-    padding: 18px;
-  }
-
-  .register-header h1 {
-    font-size: 24px;
   }
 }

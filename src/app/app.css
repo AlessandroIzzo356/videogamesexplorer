@@ -6,7 +6,8 @@
 
 main {
   flex: 1;
-  padding: 28px 32px;
+  padding: var(--main-pad-y) var(--main-pad-x);
   min-height: 0;
+  min-width: 0;
   overflow-y: auto;
 }

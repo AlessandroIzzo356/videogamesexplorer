@@ -6,13 +6,29 @@
         <p>I giochi salvati per le prossime sessioni.</p>
       </div>
       @if (games().length) {
-        <label class="reorder-toggle" aria-label="Riordina backlog">
+        <label class="reorder-toggle" [class.is-disabled]="!canReorder()" aria-label="Riordina backlog">
           <span class="toggle-label">Ordina manualmente</span>
-          <input type="checkbox" [checked]="reorderEnabled()" (change)="toggleReorder()" />
+          <input type="checkbox" [checked]="reorderEnabled()" [disabled]="!canReorder()" (change)="toggleReorder()" />
           <span class="toggle-track" aria-hidden="true"></span>
         </label>
       }
     </div>
+    @if (games().length) {
+      <div class="filters-row">
+        <app-search-input
+          ariaLabel="Cerca nel backlog"
+          placeholder="Cerca nel backlog"
+          [value]="searchQuery()"
+          (valueChange)="onSearchInput($event)"
+        ></app-search-input>
+        <div class="status-chips" role="group" aria-label="Filtra per stato">
+          <button type="button" class="status-chip" [class.active]="statusFilter() === 'all'" (click)="setStatusFilter('all')">Tutti</button>
+          <button type="button" class="status-chip" [class.active]="statusFilter() === 'to_play'" (click)="setStatusFilter('to_play')">Da giocare</button>
+          <button type="button" class="status-chip" [class.active]="statusFilter() === 'in_progress'" (click)="setStatusFilter('in_progress')">In corso</button>
+          <button type="button" class="status-chip" [class.active]="statusFilter() === 'completed'" (click)="setStatusFilter('completed')">Completati</button>
+        </div>
+      </div>
+    }
   </div>
 
   @if (isLoading()) {
@@ -31,8 +47,11 @@
     @if (reorderEnabled()) {
       <div class="reorder-hint">Usa Su / Giù per cambiare priorità</div>
     }
+    @if (!reorderEnabled() && !filteredGames().length) {
+      <div class="empty-state">Nessun risultato per i filtri selezionati.</div>
+    }
     <div class="backlog-grid">
-      @for (game of games(); track game.id ?? game.name) {
+      @for (game of filteredGames(); track game.id ?? game.name) {
         <div class="backlog-item" [class.is-moving]="lastMovedId() === game.id">
           <app-game-card
             [game]="game"
@@ -46,9 +65,9 @@
               <button
                 type="button"
                 class="reorder-btn"
-                [disabled]="$index === 0"
+                [disabled]="$index === 0 || !canReorder()"
                 aria-label="Sposta su"
-                (click)="moveGame($index, 'up')"
+                (click)="moveGame(game.id, 'up')"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M12 5l-6 6"></path>
@@ -59,9 +78,9 @@
               <button
                 type="button"
                 class="reorder-btn"
-                [disabled]="$index === games().length - 1"
+                [disabled]="$index === filteredGames().length - 1 || !canReorder()"
                 aria-label="Sposta giù"
-                (click)="moveGame($index, 'down')"
+                (click)="moveGame(game.id, 'down')"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M12 19l-6-6"></path>

@@ -7,6 +7,8 @@ type AiRequestBody = {
   genres?: string[] | null;
   platforms?: string[] | null;
   description?: string | null;
+  modalita?: string | null;
+  franchise?: string | null;
 };
 
 export async function handleAiInsight(request: Request, env: Env) {
@@ -17,7 +19,7 @@ export async function handleAiInsight(request: Request, env: Env) {
 
   try {
     const body = (await request.json()) as AiRequestBody | null;
-    const { name, released, genres, platforms, description } = body ?? {};
+    const { name, released, genres, platforms, description, modalita, franchise } = body ?? {};
 
     if (!name) {
       return withCors(
@@ -36,12 +38,16 @@ Regole di contenuto:
 3. "cosa_aspettarti": Descrivi il "flow" reale. Cosa farai pad alla mano? (Es. per Bully: "Andrai a lezione per sbloccare potenziamenti, farai scherzi ai secchioni e cercherai di non farti beccare dai prefetti mentre giri in skateboard").
 4. "perche_difficile": Se il gioco è facile, dillo! Se è difficile, spiega perché (Es. "I comandi sono vecchi e legnosi" oppure "I nemici sono spugne per proiettili").
 5. "sinossi": Riassunto narrativo in 2-3 frasi, senza spoiler.
+6. "modalita": Modalità di gioco in una stringa breve (es. "Single Player / Coop locale / Multiplayer"). Se i dati sorgente sono "N/D", prova a inferire dal contesto; se davvero impossibile, usa "N/D".
+7. "franchise": Serie/franchise principale (es. "Resident Evil", "God of War"). Se il dato sorgente è "N/D", prova a inferire dal nome; se incerto usa "N/D".
 
 Dati del gioco:
 Nome: ${name}
 Anno: ${released ?? "n/a"}
 Generi: ${(Array.isArray(genres) ? genres : []).join(", ")}
 Piattaforme: ${(Array.isArray(platforms) ? platforms : []).join(", ")}
+Modalità (sorgente): ${modalita ?? "N/D"}
+Serie / franchise (sorgente): ${franchise ?? "N/D"}
 Descrizione: ${description ?? ""}
 
 Genera ESCLUSIVAMENTE questo JSON in italiano (senza blocchi di codice):
@@ -52,6 +58,8 @@ Genera ESCLUSIVAMENTE questo JSON in italiano (senza blocchi di codice):
   "durata_stimata": "15-25 ore",
   "difficolta": "Facile | Media | Difficile | Punitivo",
   "perche_difficile": "Il vero motivo del nervoso o della semplicità.",
+  "modalita": "Single Player / Coop locale / Multiplayer | N/D",
+  "franchise": "Nome serie/franchise | N/D",
   "sinossi": "Riassunto narrativo in 2-3 frasi."
 }
 `.trim();

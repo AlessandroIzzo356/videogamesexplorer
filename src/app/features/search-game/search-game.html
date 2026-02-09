@@ -5,19 +5,15 @@
   </div>
 
   <form class="search-bar" role="search" aria-label="Cerca giochi" (submit)="onSearch($event)">
-    <span class="search-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="7"></circle>
-        <path d="M20 20l-3.2-3.2"></path>
-      </svg>
-    </span>
-    <input
-      type="search"
+    <app-search-input
+      variant="embedded"
+      ariaLabel="Cerca giochi"
       placeholder="Es. Hades, Zelda, roguelike..."
+      [debounceMs]="400"
       [value]="query()"
-      (input)="onQueryChange($any($event.target).value)"
-      (keydown.enter)="onSearch($event)"
-    />
+      (valueChange)="onQueryInput($event)"
+      (debouncedValueChange)="onSuggestionQueryChange($event)"
+    ></app-search-input>
     <button type="submit">Cerca</button>
     <span class="glow" aria-hidden="true"></span>
   </form>

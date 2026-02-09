@@ -1,0 +1,159 @@
+:root {
+  --main-pad-y: 28px;
+  --main-pad-x: 32px;
+  --page-pad-top: 20px;
+  --page-pad-x: 10px;
+  --page-pad-bottom: 40px;
+  --sidebar-width: 260px;
+  --sidebar-pad-y: 24px;
+  --sidebar-pad-x: 18px;
+  --sidebar-collapsed-width: 86px;
+  --sidebar-collapsed-pad-y: 24px;
+  --sidebar-collapsed-pad-x: 12px;
+  --backlog-h1-size: 30px;
+  --backlog-p-size: 14.5px;
+  --backlog-toggle-font: 12.5px;
+  --backlog-toggle-track-w: 46px;
+  --backlog-toggle-track-h: 26px;
+  --backlog-toggle-knob: 20px;
+  --backlog-chip-h: 32px;
+  --backlog-chip-pad-x: 12px;
+  --backlog-chip-font: 12px;
+  --search-h1-size: 32px;
+  --search-p-size: 15px;
+  --search-bar-pad-y: 12px;
+  --search-bar-pad-x: 14px;
+  --search-btn-pad-y: 9px;
+  --search-btn-pad-x: 16px;
+  --search-btn-font: 14px;
+  --search-hint-font: 12px;
+  --search-hint-pad-y: 6px;
+  --search-hint-pad-x: 10px;
+  --status-menu-min-w: 190px;
+  --auth-card-pad: 22px;
+  --auth-h1-size: 28px;
+}
+
+@media (max-width: 1100px) {
+  :root {
+    --main-pad-y: 22px;
+    --main-pad-x: 18px;
+    --sidebar-width: 210px;
+    --sidebar-pad-y: 20px;
+    --sidebar-pad-x: 14px;
+    --sidebar-collapsed-width: 86px;
+    --sidebar-collapsed-pad-y: 20px;
+    --sidebar-collapsed-pad-x: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --page-pad-top: 18px;
+    --page-pad-x: 8px;
+    --page-pad-bottom: 32px;
+    --backlog-h1-size: 26px;
+    --backlog-p-size: 13.5px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --main-pad-y: 18px;
+    --main-pad-x: 16px;
+    --sidebar-width: 72px;
+    --sidebar-pad-y: 20px;
+    --sidebar-pad-x: 10px;
+    --sidebar-collapsed-width: 72px;
+    --sidebar-collapsed-pad-y: 20px;
+    --sidebar-collapsed-pad-x: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --auth-card-pad: 18px;
+    --auth-h1-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --page-pad-top: 16px;
+    --page-pad-x: 6px;
+    --page-pad-bottom: 28px;
+    --backlog-h1-size: 24px;
+    --backlog-p-size: 13px;
+    --backlog-toggle-font: 11.5px;
+    --backlog-toggle-track-w: 40px;
+    --backlog-toggle-track-h: 22px;
+    --backlog-toggle-knob: 18px;
+    --backlog-chip-h: 30px;
+    --backlog-chip-pad-x: 10px;
+    --backlog-chip-font: 11.5px;
+    --search-h1-size: 24px;
+    --search-p-size: 13px;
+    --search-bar-pad-y: 10px;
+    --search-bar-pad-x: 12px;
+    --search-btn-pad-y: 10px;
+    --search-btn-pad-x: 14px;
+    --search-btn-font: 13px;
+    --search-hint-font: 11.5px;
+    --search-hint-pad-y: 5px;
+    --search-hint-pad-x: 9px;
+    --status-menu-min-w: 160px;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --main-pad-y: 14px;
+    --main-pad-x: 12px;
+    --sidebar-width: 64px;
+    --sidebar-pad-y: 18px;
+    --sidebar-pad-x: 8px;
+    --sidebar-collapsed-width: 64px;
+    --sidebar-collapsed-pad-y: 18px;
+    --sidebar-collapsed-pad-x: 8px;
+    --backlog-h1-size: 22px;
+    --backlog-p-size: 12.5px;
+    --backlog-toggle-font: 11px;
+    --backlog-toggle-track-w: 36px;
+    --backlog-toggle-track-h: 20px;
+    --backlog-toggle-knob: 16px;
+    --backlog-chip-h: 28px;
+    --backlog-chip-pad-x: 9px;
+    --backlog-chip-font: 11px;
+    --search-h1-size: 22px;
+    --search-p-size: 12.5px;
+    --search-bar-pad-y: 9px;
+    --search-bar-pad-x: 10px;
+    --search-btn-pad-y: 9px;
+    --search-btn-pad-x: 12px;
+    --search-btn-font: 12.5px;
+    --search-hint-font: 11px;
+    --status-menu-min-w: 140px;
+  }
+}
+
+@media (max-width: 320px) {
+  :root {
+    --main-pad-y: 10px;
+    --main-pad-x: 8px;
+    --page-pad-top: 12px;
+    --page-pad-x: 2px;
+    --page-pad-bottom: 22px;
+    --sidebar-width: 52px;
+    --sidebar-pad-y: 14px;
+    --sidebar-pad-x: 6px;
+    --sidebar-collapsed-width: 52px;
+    --sidebar-collapsed-pad-y: 14px;
+    --sidebar-collapsed-pad-x: 6px;
+    --backlog-h1-size: 21px;
+    --backlog-p-size: 12px;
+    --backlog-toggle-font: 10.5px;
+    --backlog-chip-h: 26px;
+    --backlog-chip-pad-x: 8px;
+    --backlog-chip-font: 10.5px;
+  }
+}
